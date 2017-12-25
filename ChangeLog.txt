@@ -1,0 +1,160 @@
+YYYY-MM-DD {
+	* fix or change
+	+ add
+	- delete
+}
+
+2017-12-25 {
+	+ added wsSetWindowHint function
+	* republished repository on GitHub
+}
+
+2017-12-13 {
+	+ added a new sample
+}
+
+2017-12-12 {
+	* reconfigurated makefile
+	+ added static library compile option
+	+ added wsFocusWindow
+	+ added wsTerminate
+}
+
+2017-12-10 {
+	* merged include files
+	* WS_STYLE_NOBUFFERAUTORESIZE -> WS_STYLE_NO_BUFFER_RESIZE
+	+ added WS_STYLE_NO_FRAMEBUFFER and WS_STYLE_NO_DEPTHBUFFER, which makes it
+		easier to draw static window and 2D window
+	+ added a root makefile
+	* fixed a bug that when a window's ancestor is closed in his callback,
+		the program will crash
+}
+
+2017-12-09 {
+	* fixed a bug that when the window's size changed, the cursorMoveCallback
+		rather than the windowMoveCallback will be called if windowMoveCallback
+		is set
+	* fixed the window focus algorithm, which will cause strange behavior when
+		calling keyboard about callbacks
+	+ added another example
+}
+
+2017-12-08 {
+	* adjusted makefile struct
+	* changed from bool to int, in order to satisfy language C
+}
+
+2017-12-07 {
+	* wsGetPrecursorWindow -> wsGetPrevWindow,
+	  wsGetSuccessorWindow -> wsGetNextWindow,
+	  wsGetWindowUserData -> wsGetWindowData
+	* moved code from VS to VS code
+	* pushed onto GitHub
+	+ added makefile
+}
+
+2017-09-26 {
+	* adjusted align mode from wsSetWindowSize mode to wsWindowStyle
+}
+
+2017-09-25 {
+	+ added some annotates
+}
+
+2017-09-24 {
+	* reordered wsWindowInfo structure
+	+ added wsGetPrecursorWindow and wsGetSuccessorWindow funcs
+	- deleted wsGetGlobalPosition and wsGetWindowPosition funcs
+		because these can be easily accomplished by user
+}
+
+2017-09-23 {
+	+ added wsGetWindowInfo func
+}
+
+2017-09-22 {
+	* adjusted display order so that current window's debug output won't
+		be covered by it's subwindows
+	+ added wsPostRedisplay func
+	+ added wsSetSwapInterval func
+	+ added wsSetFPS func
+	+ added wsGetWindowCursorPos func
+	+ added wsGetGlobalPosition func
+	+ added wsGetWindowPosition func
+}
+
+2017-09-20 {
+	* adjusted coordination system in calculation(from int pairs to wsCoord)
+	* adjusted style name from WS_STYLE_NO_BUFFER_RESIZE
+		to WS_STYLE_NOBUFFERAUTORESIZE
+	* split wsWindowInfo from wsWindow struct
+	+ added wsAttachWindow func
+	+ added wsGetFatherWindow func
+	+ added wsGetTopSubWindow func
+	+ added wsGetFrontWindow func
+	+ added wsFindWindowByName func
+	+ added wsUpdateBuffersize func for those windows which has a
+		WS_STYLE_NOBUFFERAUTORESIZE style
+}
+
+2017-09-17 {
+	* adjusted windowFind system (current window check)
+	* fixed a bug that when your cursor leave a window from where there
+		is a subwindow, the leave callback won't be called.
+	+ added debug output mode
+	+ added window cursor position record
+}
+
+2017-09-16 {
+	* fixed a bug that when you resize the baseWindow, the new area will
+		be scissored.
+}
+
+2017-09-10 {
+	* fixed a bug that when user close a window whose fatherwindow isn't
+		the basewindow, its fatherwindow will be close, and so as its
+		fatherwindow's fatherwindow, so on
+	* fixed a bug that when you resize a window which has style
+		WS_STYLE_NO_BUFFER_RESIZE, the image will be mismatched
+	+ added scissor function so that the subwindow will not out of the
+		range it should be in
+	+ added wsGetForegroundWindow func
+	+ added wsGetWindowUnderCursor func
+	+ added wsGetWindowOnPos func
+	+ added wsGetWindowByName func
+}
+
+2017-09-09 {
+	* re fixed a bug that when you close a window which has subwindows,
+		the program will crash
+	+ added ws*etWindowStyle funcs
+	+ added a Window Style(WS_STYLE_AUTO_DELETE)
+}
+
+2017-09-08 {
+	* fixed wsCloseWindow
+	* change param 'mode' in windowSetFuncs from numbers to mask
+	+ added wsGetWindowSize func
+	+ added wsGetWindowPos func
+	+ added wsCreateButtonWindow control func
+	+ added three Window Style
+		(WS_STYLE_NOMOVE, WS_STYLE_NORESIZE, WS_STYLE_NOFOCUS)
+	- removed wsStartProcessing and wsStopProcessing funcs
+}
+
+2017-08-30 {
+	+ added wsWindowResize proportional mode
+	+ adjusted w and h variables in wsWindowResize from int to double,
+			in order to adopt proportional resize
+}
+
+2017-08-29 {
+	* fixed framebuffer
+	+ added wsWindowMove,wsWindowResize relative mode
+	+ added wsSetWindowCallbacks relative mode
+}
+
+2017-08-28 {
+	+ added change log
+	+ added windowID recycler
+}

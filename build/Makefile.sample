@@ -1,0 +1,30 @@
+EXECUTABLES = $(patsubst $(SRC_DIR)/Sample/%.cpp, $(BIN_DIR)/%, $(wildcard $(SRC_DIR)/Sample/*.cpp))
+
+SPCXXFLAGS = $(CXXFLAGS) -L$(LIB_DIR)
+SPLDFLAGS = $(LDFLAGS)
+
+ifdef STATIC
+	SPLDFLAGS += -lopenWSs
+else
+	SPLDFLAGS += -lopenWS
+endif
+ifeq ($(OS),Windows_NT)
+	SPLDFLAGS += -lglu32
+else
+	ifdef STATIC
+		SPLDFLAGS += -lopenWSs $(shell pkg-config --static --libs glu x11 xrandr xi xxf86vm glew glfw3)
+	else
+		SPLDFLAGS += -lopenWS  $(shell pkg-config --static --libs glu x11 xrandr xi xxf86vm glew glfw3)
+	endif
+endif
+
+ifdef DEBUG
+	SPCXXFLAGS += -g
+else
+	SPCXXFLAGS += -O2
+endif
+
+sample: bin $(LIB_FULLNAME) $(EXECUTABLES)
+
+$(BIN_DIR)/%: $(SRC_DIR)/Sample/%.cpp
+	g++ -o $@ $< $(SPCXXFLAGS) $(SPLDFLAGS)

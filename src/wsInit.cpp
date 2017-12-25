@@ -46,12 +46,9 @@ inline void setGLFWWindowCallbacks() {
 inline int openGLFWWindow(const char *title) {
 	if (!glfwInit()) return false;
 
-<<<<<<< HEAD
 	for(auto* data = windowHintLists.front(); data; data = data->next)
 		glfwWindowHint(data->data.hint, data->data.value);
 	
-=======
->>>>>>> refs/remotes/origin/master
 	baseWindow->glfwwindow = glfwCreateWindow(baseWindow->size.x, baseWindow->size.y, title, 0, 0);
 	if (!baseWindow->glfwwindow) {
 		glfwTerminate();

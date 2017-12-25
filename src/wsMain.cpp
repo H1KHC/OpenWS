@@ -54,12 +54,8 @@ void wsMain() {
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	while (true) {
-<<<<<<< HEAD
 		if (!baseWindow || glfwWindowShouldClose(baseWindow->glfwwindow) || terminated)
 			break;
-=======
-		if (!baseWindow || glfwWindowShouldClose(baseWindow->glfwwindow) || terminated) break;
->>>>>>> refs/remotes/origin/master
 
 		do {
 			if (fpsControl) {

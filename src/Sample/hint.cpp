@@ -22,13 +22,17 @@ void display(int, int) {
 
 int main() {
 	wsWindowCallbacks wndCbk;
-	if(!wsInit("Example", 200, 200, 512, 512)) {
+	wsSetWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+	wsSetWindowHint(GLFW_DECORATED, GLFW_FALSE);
+	wsSetWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	wsSetWindowHint(GLFW_FLOATING, GLFW_TRUE);
+	if(!wsInit("Example", 200, 200, 256, 256)) {
 		unsigned err = wsLastError();
 		printf("Init failed, error code: %d %s", err, wsErrorString(err));
 		return -1;
 	}
 	wndCbk.displayCallback = display;
-	wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 128, 128, 256, 256, WS_ROOT_WINDOW_ID);
+	wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 0, 0, 256, 256, WS_ROOT_WINDOW_ID);
 	wsMainLoop();
 	return 0;
 }

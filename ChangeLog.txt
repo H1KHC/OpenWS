@@ -7,6 +7,7 @@ YYYY-MM-DD {
 2017-12-25 {
 	+ added wsSetWindowHint function
 	* republished repository on GitHub
+	+ added "hint" sample
 }
 
 2017-12-13 {

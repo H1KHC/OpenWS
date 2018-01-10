@@ -158,5 +158,10 @@ WS_API int wsGetWindowCursorPos(int windowID, int *x, int *y) {
 	if (y) *y = window->cursorPos.y;
 	return true;
 }
+
+WS_API GLFWwindow* wsGetGLFWWindow() {
+	checkInit(nullptr);
+	return baseWindow->glfwwindow;
+}
 #undef checkInitAndFindWindow
 #undef checkInit

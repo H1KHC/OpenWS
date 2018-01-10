@@ -1,8 +1,5 @@
 EXECUTABLES = $(patsubst $(SRC_DIR)/Sample/%.cpp, $(BIN_DIR)/%, $(wildcard $(SRC_DIR)/Sample/*.cpp))
 
-SPCXXFLAGS = $(CXXFLAGS) -L$(LIB_DIR)
-SPLDFLAGS = $(LDFLAGS)
-
 ifdef STATIC
 	SPLDFLAGS += -lopenWSs
 else
@@ -12,11 +9,14 @@ ifeq ($(OS),Windows_NT)
 	SPLDFLAGS += -lglu32
 else
 	ifdef STATIC
-		SPLDFLAGS += -lopenWSs $(shell pkg-config --static --libs glu x11 xrandr xi xxf86vm glew glfw3)
+		SPLDFLAGS += -lopenWSs $(shell pkg-config --static --libs glu x11 xrandr xi xxf86vm glew glfw3) -static-libgcc
 	else
 		SPLDFLAGS += -lopenWS  $(shell pkg-config --static --libs glu x11 xrandr xi xxf86vm glew glfw3)
 	endif
 endif
+
+SPCXXFLAGS += $(CXXFLAGS) -L$(LIB_DIR)
+SPLDFLAGS += $(LDFLAGS)
 
 ifdef DEBUG
 	SPCXXFLAGS += -g

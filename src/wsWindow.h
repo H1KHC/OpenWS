@@ -1,6 +1,5 @@
 #ifndef __WS_WINDOW__
 #define __WS_WINDOW__
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <openWS.h>
 #include <GLFW/glfw3.h>

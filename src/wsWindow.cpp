@@ -35,8 +35,9 @@ void wsWindow::deleteWindow() {
 
 void wsWindow::display(int lastX, int lastY, int cutX, int cutY, int cutWidth, int cutHeight) {
 	extern int debugOutput;
-	//Update global this window's global position
-	lastX += position.x, lastY += position.y;
+	//Update this window's global position
+	if(windowID != WS_ROOT_WINDOW_ID)
+		lastX += position.x, lastY += position.y;
 
 	//Update scissor range
 	if (cutX < lastX) cutWidth -= lastX - cutX, cutX = lastX;

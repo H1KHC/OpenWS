@@ -144,6 +144,12 @@ void wsWindow::windowResizeReceiver(wsCoord2 newSize) {
 								node->data->position.y += deltaSize.y; break;
 		}
 	}
+	if(windowID == WS_ROOT_WINDOW_ID) {
+		glfwSetWindowPos(((wsBaseWindow*)this)->glfwwindow,
+							position.x, position.y);
+		glfwSetWindowSize(((wsBaseWindow*)this)->glfwwindow,
+							size.x, size.y);
+	}
 	if (callbacks.windowResizeCallback) {
 		makeContextCurrent();
 		callbacks.windowResizeCallback(windowID, newSize.x, newSize.y);
@@ -152,6 +158,10 @@ void wsWindow::windowResizeReceiver(wsCoord2 newSize) {
 }
 void wsWindow::windowMoveReceiver(wsCoord2 newPos) {
 	position = newPos;
+	if(windowID == WS_ROOT_WINDOW_ID) {
+		glfwSetWindowPos(((wsBaseWindow*)this)->glfwwindow,
+							position.x, position.y);
+	}
 	if (callbacks.windowMoveCallback) {
 		makeContextCurrent();
 		callbacks.windowMoveCallback(windowID, newPos.x, newPos.y);

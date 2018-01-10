@@ -14,7 +14,7 @@ WS_API int wsSetWindowHint(int hint, int value) {
 		return false;
 	}
 	windowHintLists.addBack(windowHintData{hint, value});
-	return false;
+	return true;
 }
 
 inline void setGLFWWindowCallbacks() {
@@ -88,7 +88,7 @@ inline int initGLEW() {
 int wsInit(const char * title, const int x, const int y, const int width, const int height) {
 	wsWindowCallbacks nullCallbacks;
 
-	baseWindow = new wsBaseWindow(title, { 0, 0 }, {width, height}, &nullCallbacks);
+	baseWindow = new wsBaseWindow(title, { x, y }, {width, height}, &nullCallbacks);
 	if (!openGLFWWindow(title)) {
 		wsSetError(WS_ERR_GLFW_INITIALIZATION_FAILED);
 		glfwSetWindowShouldClose(baseWindow->glfwwindow, 1);

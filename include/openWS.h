@@ -160,6 +160,13 @@ extern "C" {
 #define WS_KEY_RIGHT_SUPER        347
 #define WS_KEY_MENU               348
 
+#define WS_MOD_SHIFT            0x0001
+#define WS_MOD_CONTROL          0x0002
+#define WS_MOD_ALT              0x0004
+#define WS_MOD_SUPER            0x0008
+#define WS_MOD_CAPS_LOCK        0x0010
+#define WS_MOD_NUM_LOCK         0x0020
+
 #define WS_KEY_LAST               WS_KEY_MENU
 
 // Callback typedefs
@@ -405,6 +412,9 @@ WS_API const char * wsErrorString(int err);
 WS_API void wsMainLoop();
 
 WS_API int wsTerminate();
+
+struct GLFWwindow;
+WS_API GLFWwindow* wsGetGLFWWindow();
 
 #ifdef __cplusplus
 }

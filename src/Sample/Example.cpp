@@ -28,7 +28,7 @@ int main() {
 		return -1;
 	}
 	wndCbk.displayCallback = display;
-	wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 128, 128, 256, 256, WS_ROOT_WINDOW_ID);
+	wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 128, 128, 256, 256, nullptr, WS_ROOT_WINDOW_ID);
 	wsMainLoop();
 	return 0;
 }

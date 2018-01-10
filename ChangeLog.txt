@@ -4,10 +4,21 @@ YYYY-MM-DD {
 	- delete
 }
 
+2017-12-26 {
+	* changed sample name from "hint" to "decoration"
+	+ added decoration mouse transparent on windows
+	* fixed a bug that when user call wsSetWindowCallbacks to set a display
+		callback, the style WS_STYLE_STATIC_WINDOW will be ignored
+	* fixed a bug that when user call wsSetWindowPos or wsSetWindowSize to
+		change baseWindow's attribute, it will cause strange behavior
+}
+
 2017-12-25 {
 	+ added wsSetWindowHint function
 	* republished repository on GitHub
 	+ added "hint" sample
+	+ added wsGetGLFWWindow
+	+ added WS_MOD_*
 }
 
 2017-12-13 {

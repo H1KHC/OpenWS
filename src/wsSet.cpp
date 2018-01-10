@@ -119,6 +119,8 @@ WS_API int wsSetWindowCallbacks(int windowID, const wsWindowCallbacks * windowCa
 		wsSetError(WS_ERR_INVALID_VALUE);
 		return false;
 	}
+	if(window->styleMask & WS_STYLE_STATIC_WINDOW)
+		window->callbacks.displayCallback = nullptr;
 	return true;
 }
 WS_API int wsSetWindowSize(int windowID, double w, double h, int mode) {

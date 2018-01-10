@@ -1,13 +1,13 @@
 #include "wsWindow.h"
 
 void wsWindow::displayReceiver() {
-	if (!(styleMask & WS_STYLE_NODISPLAY) && callbacks.displayCallback) {
+	if (!(styleMask & WS_STYLE_NODISPLAY) && displayCallback) {
 		makeContextCurrent();
-		callbacks.displayCallback(windowID, framebuffer);
+		displayCallback(windowID, framebuffer);
 		freeContext();
 
-		// In order to avoid the issue that on some machine, all the colors
-		//  except blue will be erased in the subwindow
+		// In order to avoid the issue that all the colors except blue will
+		//  be erased in the subwindow on some machine
 		glColor3f(1.0f, 1.0f, 1.0f);
 	}
 	for (wsWindowListNode *node = subWindow.front(); node; node = node->next) {
@@ -22,9 +22,9 @@ int wsWindow::keyboardReceiver(int key, int scancode, int action, int mods) {
 		//	program will be crashed caused by segmentation fault
 		if(!this) return false;
 
-		if (callbacks.keyboardCallback) {
+		if (keyboardCallback) {
 			makeContextCurrent();
-			int ret = callbacks.keyboardCallback(windowID, key, scancode, action, mods);
+			int ret = keyboardCallback(windowID, key, scancode, action, mods);
 			freeContext();
 			return ret;
 		}
@@ -34,9 +34,9 @@ int wsWindow::keyboardReceiver(int key, int scancode, int action, int mods) {
 int wsWindow::charReceiver(unsigned key, int mods) {
 	if (subWindow.isEmpty() || !subWindow.front()->data->focused || subWindow.front()->data->charReceiver(key, mods)) {
 		if(!this) return false;
-		if (callbacks.charCallback) {
+		if (charCallback) {
 			makeContextCurrent();
-			int ret = callbacks.charCallback(windowID, key, mods);
+			int ret = charCallback(windowID, key, mods);
 			freeContext();
 			return ret;
 		}
@@ -48,9 +48,9 @@ int wsWindow::mouseReceiver(int button, int action, int mods) {
 	focusWindowUnderCursor();
 	if (windowUnderCursor == nullptr || windowUnderCursor->data->mouseReceiver(button, action, mods)) {
 		if(!this) return false;
-		if (callbacks.mouseCallback) {
+		if (mouseButtonCallback) {
 			makeContextCurrent();
-			int ret = callbacks.mouseCallback(windowID, button, action, mods);
+			int ret = mouseButtonCallback(windowID, button, action, mods);
 			freeContext();
 			return ret;
 		}
@@ -63,9 +63,9 @@ int wsWindow::cursorMoveReceiver(double xpos, double ypos) {
 	updateCursorWindow();
 	if (windowUnderCursor == nullptr || windowUnderCursor->data->cursorMoveReceiver(xpos - windowUnderCursor->data->position.x, ypos - windowUnderCursor->data->position.y)) {
 		if(!this) return false;
-		if (callbacks.cursorMoveCallback) {
+		if (cursorMoveCallback) {
 			makeContextCurrent();
-			int ret = callbacks.cursorMoveCallback(windowID, xpos, ypos);
+			int ret = cursorMoveCallback(windowID, xpos, ypos);
 			freeContext();
 			return ret;
 		}
@@ -78,9 +78,9 @@ int wsWindow::scrollReceiver(double xoffset, double yoffset) {
 	if ((windowUnderCursor == nullptr || windowUnderCursor->data->scrollReceiver(xoffset, yoffset))
 		|| (subWindow.isEmpty() || subWindow.front()->data->scrollReceiver(xoffset, yoffset))) {
 		if(!this) return false;
-		if (callbacks.scrollCallback) {
+		if (scrollCallback) {
 			makeContextCurrent();
-			int ret = callbacks.scrollCallback(windowID, xoffset, yoffset);
+			int ret = scrollCallback(windowID, xoffset, yoffset);
 			freeContext();
 			return ret;
 		}
@@ -91,9 +91,9 @@ int wsWindow::scrollReceiver(double xoffset, double yoffset) {
 int wsWindow::fileDropReceiver(int count, const char ** filename) {
 	if (windowUnderCursor == nullptr || windowUnderCursor->data->fileDropReceiver(count, filename)) {
 		if(!this) return false;
-		if (callbacks.fileDropCallback) {
+		if (fileDropCallback) {
 			makeContextCurrent();
-			int ret = callbacks.fileDropCallback(windowID, count, filename);
+			int ret = fileDropCallback(windowID, count, filename);
 			freeContext();
 			return ret;
 		}
@@ -108,9 +108,9 @@ void wsWindow::cursorEnterReceiver(int entered) {
 		if (!entered)windowUnderCursor = nullptr;
 	}
 	else underCursor = entered;
-	if (callbacks.cursorEnterCallback) {
+	if (cursorEnterCallback) {
 		makeContextCurrent();
-		callbacks.cursorEnterCallback(windowID, entered);
+		cursorEnterCallback(windowID, entered);
 		freeContext();
 	}
 }
@@ -150,9 +150,9 @@ void wsWindow::windowResizeReceiver(wsCoord2 newSize) {
 		glfwSetWindowSize(((wsBaseWindow*)this)->glfwwindow,
 							size.x, size.y);
 	}
-	if (callbacks.windowResizeCallback) {
+	if (windowResizeCallback) {
 		makeContextCurrent();
-		callbacks.windowResizeCallback(windowID, newSize.x, newSize.y);
+		windowResizeCallback(windowID, newSize.x, newSize.y);
 		freeContext();
 	}
 }
@@ -162,27 +162,27 @@ void wsWindow::windowMoveReceiver(wsCoord2 newPos) {
 		glfwSetWindowPos(((wsBaseWindow*)this)->glfwwindow,
 							position.x, position.y);
 	}
-	if (callbacks.windowMoveCallback) {
+	if (windowMoveCallback) {
 		makeContextCurrent();
-		callbacks.windowMoveCallback(windowID, newPos.x, newPos.y);
+		windowMoveCallback(windowID, newPos.x, newPos.y);
 		freeContext();
 	}
 }
 void wsWindow::windowCloseReceiver() {
 	while (subWindow.front())
 		subWindow.front()->data->windowCloseReceiver();
-	if (callbacks.windowCloseCallback) {
+	if (windowCloseCallback) {
 		makeContextCurrent();
-		callbacks.windowCloseCallback(windowID);
+		windowCloseCallback(windowID);
 		freeContext();
 	}
 	if(this) deleteWindow();
 }
 void wsWindow::windowFocusReceiver(int focus) {
 	focused = focus;
-	if (callbacks.windowFocusCallback) {
+	if (windowFocusCallback) {
 		makeContextCurrent();
-		callbacks.windowFocusCallback(windowID, focus);
+		windowFocusCallback(windowID, focus);
 		freeContext();
 	}
 }

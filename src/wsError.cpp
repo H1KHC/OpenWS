@@ -24,9 +24,9 @@ void wsSetError(const int err) {
 	wsError = err;
 }
 
-WS_API unsigned wsLastError() {
+unsigned wsLastError() {
 	return wsError;
 }
-WS_API const char * wsErrorString(const int err) {
+const char * wsErrorString(const int err) {
 	return errString[err];
 }

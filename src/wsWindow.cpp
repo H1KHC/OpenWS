@@ -4,8 +4,31 @@
 extern int inited;
 extern wsWindow *currentWindow;
 
-wsWindow::wsWindow(const char * title, const wsCoord2 position, const wsCoord2 size, const int style, wsWindowCallbacks *wndCallbacks) :
-	wsWindowInfo{ nullptr, 0, position, size, 0, size, false, false, wsCoord2{ 0, 0 }, style, *wndCallbacks, nullptr },
+wsWindow::wsWindow(const char * title, const wsCoord2 position,
+				   const wsCoord2 size, const int style) :
+	wsWindowInfo{
+		nullptr,			//name
+		0,					//windowID
+		position, size,		//position, size
+		0,					//texture
+		size,				//bufferSize
+		false, false,		//focused, underCursor
+		wsCoord2{ 0, 0 },	//cursorPos
+		style,				//styleMask
+		nullptr,			//displayCallback
+		nullptr,			//mouseButtonCallback
+		nullptr,			//cursorMoveCallback
+		nullptr,			//cursorEnterCallback
+		nullptr,			//scrollCallback
+		nullptr,			//keyCallback
+		nullptr,			//charCallback
+		nullptr,			//fileDropCallback
+		nullptr,			//windowMoveCallback
+		nullptr,			//windowResizeCallback
+		nullptr,			//windowCloseCallback
+		nullptr,			//windowFocusCallback
+		nullptr				//userData
+	},
 	fatherWindow(nullptr),
 	windowUnderCursor(nullptr)
 {
@@ -24,7 +47,8 @@ wsWindow::~wsWindow() {
 
 void wsWindow::deleteWindow() {
 	if (fatherWindow) {
-		if (fatherWindow->windowUnderCursor && fatherWindow->windowUnderCursor->data == this)
+		if (fatherWindow->windowUnderCursor &&
+		  fatherWindow->windowUnderCursor->data == this)
 			fatherWindow->windowUnderCursor = nullptr;
 		fatherWindow->subWindow.deleteNode(this);
 	}
@@ -33,7 +57,8 @@ void wsWindow::deleteWindow() {
 	delete this;
 }
 
-void wsWindow::display(int lastX, int lastY, int cutX, int cutY, int cutWidth, int cutHeight) {
+void wsWindow::display(int lastX, int lastY,
+					   int cutX, int cutY, int cutWidth, int cutHeight) {
 	extern int debugOutput;
 	//Update this window's global position
 	if(windowID != WS_ROOT_WINDOW_ID)
@@ -53,10 +78,14 @@ void wsWindow::display(int lastX, int lastY, int cutX, int cutY, int cutWidth, i
 	if (!(styleMask & WS_STYLE_NODISPLAY)) {
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glBegin(GL_QUADS);
-		glTexCoord2d(0, 0); glVertex2i(lastX, baseWindow->size.y - lastY - size.y);
-		glTexCoord2d(1, 0); glVertex2i(lastX + size.x, baseWindow->size.y - lastY - size.y);
-		glTexCoord2d(1, 1); glVertex2i(lastX + size.x, baseWindow->size.y - lastY);
-		glTexCoord2d(0, 1); glVertex2i(lastX, baseWindow->size.y - lastY);
+		glTexCoord2d(0, 0);
+		glVertex2i(lastX, baseWindow->size.y - lastY - size.y);
+		glTexCoord2d(1, 0);
+		glVertex2i(lastX + size.x, baseWindow->size.y - lastY - size.y);
+		glTexCoord2d(1, 1);
+		glVertex2i(lastX + size.x, baseWindow->size.y - lastY);
+		glTexCoord2d(0, 1);
+		glVertex2i(lastX, baseWindow->size.y - lastY);
 		glEnd();
 #ifdef _DEBUG
 		//Debug output
@@ -119,32 +148,30 @@ void wsWindow::display(int lastX, int lastY, int cutX, int cutY, int cutWidth, i
 		findWindow(window, id, failReturnValue);\
 	}while(0)
 
-WS_API int wsCreateWindow(int windowStyle, const char *windowName, wsWindowCallbacks *windowCallbacks, int x, int y, int width, int height, void *windowData, int fatherWindowID) {
+int wsCreateWindow(int windowStyle, const char *windowName, int x, int y, int width, int height, void *windowData, int fatherWindowID) {
 	wsWindow *newWindow, *toBeAttached;
-	if((windowStyle & WS_STYLE_NO_FRAMEBUFFER) && windowCallbacks->displayCallback == nullptr) {
-		wsSetError(WS_ERR_ILLEGAL_OPERATION);
-		return WS_INVALID_WINDOW_ID;
-	}
 	checkInitAndFindWindow(toBeAttached, fatherWindowID, WS_INVALID_WINDOW_ID);
-	newWindow = new wsWindow(windowName, wsCoord2{ x, y }, wsCoord2{ width, height }, windowStyle, windowCallbacks);
+	newWindow = new wsWindow(windowName, wsCoord2{ x, y }, wsCoord2{ width, height }, windowStyle);
 	newWindow->fatherWindow = toBeAttached;
 	newWindow->userData = windowData;
 	if(!newWindow->genFramebuffer()) {
 		delete newWindow;
+		wsSetError(WS_ERR_FRAMEBUFFER_GENERATE_FAILED);
 		return WS_INVALID_WINDOW_ID;
 	}
 	newWindow->focused = true;
 	toBeAttached->subWindow.addFront(newWindow);
 	newWindow->thisWindowNode = toBeAttached->getSubWindowList()->front();
+	currentWindow = newWindow;
 	return newWindow->windowID;
 }
-WS_API int wsCloseWindow(int windowID) {
+int wsCloseWindow(int windowID) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->windowCloseReceiver();
 	return true;
 }
-WS_API int wsAttachWindow(int subwindowID, int fatherWindowID) {
+int wsAttachWindow(int subwindowID, int fatherWindowID) {
 	wsWindow *subWindow, *fatherWindow;
 	checkInit(false);
 	if (!subwindowID || subwindowID == fatherWindowID) {
@@ -158,7 +185,7 @@ WS_API int wsAttachWindow(int subwindowID, int fatherWindowID) {
 	subWindow->fatherWindow = fatherWindow;
 	return true;
 }
-WS_API int wsFocusWindow(int windowID) {
+int wsFocusWindow(int windowID) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	while(window->fatherWindow) {

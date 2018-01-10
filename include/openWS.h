@@ -169,14 +169,17 @@ extern "C" {
 
 #define WS_KEY_LAST               WS_KEY_MENU
 
-// Callback typedefs
+//	These are all the callbacks the window will use,
+//	if the callback function returns a integer, it
+//	means the user can choose whether to call next window's
+//	callback (on 1) or stop transfering it (on 0).
 typedef void(*wsDisplayCallback)		(int windowID, int currentFramebuffer);
 
 typedef int(*wsMouseButtonCallback)		(int windowID, int button, int action, int mods);
 typedef int(*wsCursorMoveCallback)		(int windowID, int xpos, int ypos);
 typedef void(*wsCursorEnterCallback)	(int windowID, int entered);
 typedef int(*wsScrollCallback)			(int windowID, double xoffset, double yoffset);
-typedef int(*wsKeyCallback)				(int windowID, int key, int scancode, int action, int mods);
+typedef int(*wsKeyboardCallback)		(int windowID, int key, int scancode, int action, int mods);
 typedef int(*wsCharCallback)			(int windowID, unsigned int unicode, int mods);
 typedef int(*wsFileDropCallback)		(int windowID, int count, const char **filename);
 
@@ -184,42 +187,6 @@ typedef void(*wsWindowMoveCallback)		(int windowID, int x, int y);
 typedef void(*wsWindowResizeCallback)	(int windowID, int w, int h);
 typedef void(*wsWindowCloseCallback)	(int windowID);
 typedef void(*wsWindowFocusCallback)	(int windowID, int focused);
-
-//	Indicate all the callbacks the certain window will use,
-//	if the callback function has a int return-value, it
-//	means the user can choose whether to call next window's
-//	callback (on 1) or stop transfering it (on 0).
-typedef struct wsWindowCallbacks {
-	wsDisplayCallback			displayCallback;
-	wsMouseButtonCallback		mouseCallback;
-	wsCursorMoveCallback		cursorMoveCallback;
-	wsCursorEnterCallback		cursorEnterCallback;
-	wsScrollCallback			scrollCallback;
-	wsKeyCallback				keyboardCallback;
-	wsCharCallback				charCallback;
-	wsFileDropCallback			fileDropCallback;
-
-	wsWindowMoveCallback		windowMoveCallback;
-	wsWindowResizeCallback		windowResizeCallback;
-	wsWindowCloseCallback		windowCloseCallback;
-	wsWindowFocusCallback		windowFocusCallback;
-#ifdef __cplusplus
-	wsWindowCallbacks() :
-		displayCallback(0),
-		mouseCallback(0),
-		cursorMoveCallback(0),
-		cursorEnterCallback(0),
-		scrollCallback(0),
-		keyboardCallback(0),
-		charCallback(0),
-		fileDropCallback(0),
-		windowMoveCallback(0),
-		windowResizeCallback(0),
-		windowCloseCallback(0),
-		windowFocusCallback(0) {
-	}
-#endif
-} wsWindowCallbacks;
 
 typedef struct wsCoord2 {
 	int x, y;
@@ -234,7 +201,18 @@ typedef struct wsWindowInfo {
 	int focused, underCursor;
 	wsCoord2 cursorPos;
 	int styleMask;
-	wsWindowCallbacks callbacks;
+	wsDisplayCallback displayCallback;
+	wsMouseButtonCallback mouseButtonCallback;
+	wsCursorMoveCallback cursorMoveCallback;
+	wsCursorEnterCallback cursorEnterCallback;
+	wsScrollCallback scrollCallback;
+	wsKeyboardCallback keyboardCallback;
+	wsCharCallback charCallback;
+	wsFileDropCallback fileDropCallback;
+	wsWindowMoveCallback windowMoveCallback;
+	wsWindowResizeCallback windowResizeCallback;
+	wsWindowCloseCallback windowCloseCallback;
+	wsWindowFocusCallback windowFocusCallback;
 	void *userData;
 } wsWindowInfo;
 
@@ -250,6 +228,7 @@ enum {
 	WS_ERR_THREAD_CREATE_FAILED,
 
 	//WINDOW OPERATION
+	WS_ERR_FRAMEBUFFER_GENERATE_FAILED,
 	WS_ERR_BUFFER_RESIZE_FAILED,
 	WS_ERR_WINDOW_NOT_FOUND,
 
@@ -315,7 +294,7 @@ WS_API int wsDeinit();
 
 // Default style
 #define WS_STYLE_DEFAULT				WS_STYLE_ALIGN_LU | WS_STYLE_NO_DEPTHBUFFER
-WS_API int wsCreateWindow(int windowStyle, const char *windowName, wsWindowCallbacks *windowCallbacks, int x, int y, int width, int height, void *windowData, int fatherWindowID DEFAULT(WS_ROOT_WINDOW_ID));
+WS_API int wsCreateWindow(int windowStyle, const char *windowName, int x, int y, int width, int height, void *windowData, int fatherWindowID DEFAULT(WS_ROOT_WINDOW_ID));
 WS_API int wsCloseWindow(int windowID);
 WS_API int wsAttachWindow(int subwindowID, int fatherWindowID);
 WS_API int wsFocusWindow(int windowID);
@@ -336,7 +315,6 @@ WS_API int wsGetNextWindow(int windowID);
 
 //Window-based get functions
 
-WS_API int wsGetWindowCallbacks(int windowID, wsWindowCallbacks * windowCallbacks);
 WS_API int wsGetWindowSize(int windowID, int *w, int *h);
 WS_API int wsGetWindowPos(int windowID, int *x, int *y);
 WS_API int wsGetWindowStyle(int windowID, int *style);
@@ -368,14 +346,18 @@ WS_API int wsSetDebugMode(int mode DEFAULT(WS_SDM_CLOSE));
 #endif
 
 //Window-based set functions
-
-//Totally cover the original settings
-#define WS_SWC_COVER			0x00000000
-//Only adjust those which were null
-#define WS_SWC_ADD				0x00000001
-//Only adjust those which were not null
-#define WS_SWC_UPDATE			0x00000002
-WS_API int wsSetWindowCallbacks(int windowID, const wsWindowCallbacks *windowCallbacks, int mode DEFAULT(WS_SWC_COVER));
+WS_API int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback);
+WS_API int wsSetWindowMouseButtonCallback(int windowID, wsMouseButtonCallback callback);
+WS_API int wsSetWindowCursorMoveCallback(int windowID, wsCursorMoveCallback callback);
+WS_API int wsSetWindowCursorEnterCallback(int windowID, wsCursorEnterCallback callback);
+WS_API int wsSetWindowScrollCallback(int windowID, wsScrollCallback callback);
+WS_API int wsSetWindowKeyboardCallback(int windowID, wsKeyboardCallback callback);
+WS_API int wsSetWindowCharCallback(int windowID, wsCharCallback callback);
+WS_API int wsSetWindowFileDropCallback(int windowID, wsFileDropCallback callback);
+WS_API int wsSetWindowMoveCallback(int windowID, wsWindowMoveCallback callback);
+WS_API int wsSetWindowResizeCallback(int windowID, wsWindowResizeCallback callback);
+WS_API int wsSetWindowCloseCallback(int windowID, wsWindowCloseCallback callback);
+WS_API int wsSetWindowFocusCallback(int windowID, wsWindowFocusCallback callback);
 
 #define WS_SWSI_RELATIVE		0x00000000
 #define WS_SWSI_ABSOLUTE		0x00000001

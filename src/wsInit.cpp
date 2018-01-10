@@ -8,7 +8,7 @@ struct windowHintData {
 };
 static wsList<windowHintData> windowHintLists;
 
-WS_API int wsSetWindowHint(int hint, int value) {
+int wsSetWindowHint(int hint, int value) {
 	if(inited) {
 		wsSetError(WS_ERR_ILLEGAL_OPERATION);
 		return false;
@@ -86,9 +86,7 @@ inline int initGLEW() {
 	return true;
 }
 int wsInit(const char * title, const int x, const int y, const int width, const int height) {
-	wsWindowCallbacks nullCallbacks;
-
-	baseWindow = new wsBaseWindow(title, { x, y }, {width, height}, &nullCallbacks);
+	baseWindow = new wsBaseWindow(title, { x, y }, {width, height});
 	if (!openGLFWWindow(title)) {
 		wsSetError(WS_ERR_GLFW_INITIALIZATION_FAILED);
 		glfwSetWindowShouldClose(baseWindow->glfwwindow, 1);

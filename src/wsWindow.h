@@ -17,8 +17,9 @@ protected:
 	wsWindowListNode *windowUnderCursor, *thisWindowNode;
 
 	friend class wsWindowManager;
-
-	friend int wsCreateWindow(int windowStyle, const char *windowName, wsWindowCallbacks *windowCallbacks, int x, int y, int width, int height, void *windowData, int fatherWindowID);
+	
+	friend int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback);
+	friend int wsCreateWindow(int windowStyle, const char *windowName, int x, int y, int width, int height, void *windowData, int fatherWindowID);
 	friend int wsAttachWindow(int subwindowID, int fatherWindowID);
 	friend int wsFocusWindow(int windowID);
 
@@ -45,7 +46,7 @@ public:
 	}
 
 	wsWindow() = delete;
-	wsWindow(const char *title, const wsCoord2 position, const wsCoord2 size, const int style, wsWindowCallbacks *wndCallbacks);
+	wsWindow(const char *title, const wsCoord2 position, const wsCoord2 size, const int style);
 	~wsWindow();
 
 	void display(int lastX, int lastY, int cutX, int cutY, int cutWidth, int cutHeight);
@@ -92,30 +93,13 @@ public:
 		int generateFramebuffer(GLuint &frameBuffer, GLuint &depthBuffer, GLuint &texture, const int width, const int height);
 		int generateFramebuffer(GLuint &frameBuffer, GLuint &texture, const int width, const int height);
 		bufferSize = size;
-		if(styleMask & WS_STYLE_NO_FRAMEBUFFER) {
-			if(styleMask & WS_STYLE_NO_DEPTHBUFFER) {
-				generateFramebuffer(framebuffer, texture, size.x, size.y);
-				depthbuffer = 0;
-			} else {
-				generateFramebuffer(framebuffer, depthbuffer, texture, size.x, size.y);
-			}
-			makeContextCurrent();
-			callbacks.displayCallback(windowID, framebuffer);
-			freeContext();
-			glColor3f(1.0f, 1.0f, 1.0f);
-			callbacks.displayCallback = nullptr;
-			glDeleteFramebuffers(1, &framebuffer), framebuffer = 0;
-			if(depthbuffer) glDeleteRenderbuffers(1, &depthbuffer);
-			return true;
+		if(styleMask & WS_STYLE_NO_DEPTHBUFFER) {
+			generateFramebuffer(framebuffer, texture, size.x, size.y);
+			depthbuffer = 0;
 		} else {
-			if(styleMask & WS_STYLE_NO_DEPTHBUFFER) {
-				generateFramebuffer(framebuffer, texture, size.x, size.y);
-				depthbuffer = 0;
-			} else {
-				generateFramebuffer(framebuffer, depthbuffer, texture, size.x, size.y);
-			}
-			return true;
+			generateFramebuffer(framebuffer, depthbuffer, texture, size.x, size.y);
 		}
+		return true;
 	}
 
 	void deleteWindow();
@@ -136,8 +120,8 @@ public:
 
 typedef struct wsBaseWindow : public wsWindow {
 	GLFWwindow *glfwwindow;
-	wsBaseWindow(const char *title, const wsCoord2 position, const wsCoord2 size, wsWindowCallbacks *wndCallbacks)
-		:wsWindow(title, position, size, WS_STYLE_DEFAULT, wndCallbacks) {};
+	wsBaseWindow(const char *title, const wsCoord2 position, const wsCoord2 size)
+		:wsWindow(title, position, size, WS_STYLE_DEFAULT) {};
 } wsBaseWindow;
 
 extern wsBaseWindow *baseWindow;

@@ -92,11 +92,14 @@ void enterC(int windowID, int) {
 	data->pressed = data->rpressed = false;
 }
 
-wsWindowCallbacks wndCbk;
-
 int createWindow(int, int button, int state, int) {
-	if (button == WS_MOUSE_BUTTON_LEFT && state == WS_PRESS)
-		wsCreateWindow(WS_STYLE_ALIGN_LD, "noName", &wndCbk, 128, 128, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	if (button == WS_MOUSE_BUTTON_LEFT && state == WS_PRESS) {
+		int id = wsCreateWindow(WS_STYLE_ALIGN_LD, "noName", 128, 128, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+		wsSetWindowDisplayCallback(id, display);
+		wsSetWindowCursorMoveCallback(id, cursor);
+		wsSetWindowMouseButtonCallback(id, mouse);
+		wsSetWindowCursorEnterCallback(id, enterC);
+	}
 	return 0;
 }
 
@@ -118,17 +121,28 @@ int main() {
 #ifdef _DEBUG
 	wsSetDebugMode(WS_SDM_FULL);
 #endif
-	wndCbk.windowCloseCallback = recycle;
-	wndCbk.mouseCallback = createWindow;
-	wndCbk.cursorMoveCallback = remPos;
-	wsSetWindowCallbacks(WS_ROOT_WINDOW_ID, &wndCbk, WS_SWC_COVER);
-	wndCbk.displayCallback = display;
-	wndCbk.cursorMoveCallback = cursor;
-	wndCbk.mouseCallback = mouse;
-	wndCbk.cursorEnterCallback = enterC;
-	id = wsCreateWindow(WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_LD, "Window1", &wndCbk, 128, 128, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
-	nid = wsCreateWindow(WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_RD, "Window2", &wndCbk, 64, 64, 128, 128, new windowData, id);
-	wsCreateWindow(WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_NORESIZE, "Window3", &wndCbk, 32, 32, 64, 64, new windowData, nid);
+	wsSetWindowCloseCallback(WS_ROOT_WINDOW_ID, recycle);
+	wsSetWindowMouseButtonCallback(WS_ROOT_WINDOW_ID, createWindow);
+	wsSetWindowCursorMoveCallback(WS_ROOT_WINDOW_ID, remPos);
+
+	id = wsCreateWindow(WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_LD, "Window1", 128, 128, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	wsSetWindowDisplayCallback(id, display);
+	wsSetWindowCursorMoveCallback(id, cursor);
+	wsSetWindowMouseButtonCallback(id, mouse);
+	wsSetWindowCursorEnterCallback(id, enterC);
+
+	nid = wsCreateWindow(WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_RD, "Window2", 64, 64, 128, 128, new windowData, id);
+	wsSetWindowDisplayCallback(nid, display);
+	wsSetWindowCursorMoveCallback(nid, cursor);
+	wsSetWindowMouseButtonCallback(nid, mouse);
+	wsSetWindowCursorEnterCallback(nid, enterC);
+
+	id = wsCreateWindow(WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_NORESIZE, "Window3", 32, 32, 64, 64, new windowData, nid);
+	wsSetWindowDisplayCallback(id, display);
+	wsSetWindowCursorMoveCallback(id, cursor);
+	wsSetWindowMouseButtonCallback(id, mouse);
+	wsSetWindowCursorEnterCallback(id, enterC);
+
 	wsMainLoop();
 	return 0;
 }

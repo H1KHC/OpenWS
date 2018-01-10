@@ -21,14 +21,13 @@ void display(int, int) {
 }
 
 int main() {
-	wsWindowCallbacks wndCbk;
 	if(!wsInit("Example", 200, 200, 512, 512)) {
 		unsigned err = wsLastError();
 		printf("Init failed, error code: %d %s", err, wsErrorString(err));
 		return -1;
 	}
-	wndCbk.displayCallback = display;
-	wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 128, 128, 256, 256, nullptr, WS_ROOT_WINDOW_ID);
+	int id = wsCreateWindow(WS_STYLE_DEFAULT, "", 128, 128, 256, 256, nullptr, WS_ROOT_WINDOW_ID);
+	wsSetWindowDisplayCallback(id, display);
 	wsMainLoop();
 	return 0;
 }

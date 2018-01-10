@@ -4,6 +4,10 @@ YYYY-MM-DD {
 	- delete
 }
 
+2018-01-10 {
+	* changed callback function setting ports' style
+}
+
 2017-12-26 {
 	* changed sample name from "hint" to "decoration"
 	+ added decoration mouse transparent on windows

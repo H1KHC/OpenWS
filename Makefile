@@ -32,7 +32,7 @@ include build/Makefile.$(PLATFORM)
 
 .PHONY: all sample pre rebuild distclean clean platform
 
-all: pre $(LIB_FULLNAME) distclean
+all: pre $(LIB_FULLNAME)
 
 rebuild: clean all
 

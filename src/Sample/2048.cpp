@@ -327,10 +327,9 @@ void check() {
 	for(int i = 0; i < 4; ++i)
 		for(int j = 0; j < 3; ++j)
 			if(Map[i][j] == Map[i][j + 1] || Map[j][i] == Map[j + 1][i]) return;
-	wsWindowCallbacks wndCbk;
-	wndCbk.displayCallback = halfopacityCovery;
-	wndCbk.keyboardCallback = failKey;
-	wsCreateWindow(WS_STYLE_DEFAULT, "fail", &wndCbk, 30, 80, 440, 440, nullptr);
+	int id = wsCreateWindow(WS_STYLE_DEFAULT, "fail", 30, 80, 440, 440, nullptr);
+	wsSetWindowDisplayCallback(id, halfopacityCovery);
+	wsSetWindowKeyboardCallback(id, failKey);
 }
 void mapUp() {
 	bool updated = false;
@@ -439,7 +438,6 @@ void mapReset() {
 }
 
 int main() {
-	wsWindowCallbacks wndCbk;
     wsInit("2048", 128, 128, 500, 550);
 	srand(time(0));
 	glEnable(GL_LINE_SMOOTH);
@@ -447,13 +445,12 @@ int main() {
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	mapReset();
-	wndCbk.displayCallback = displayMap;
-	wsCreateWindow(WS_STYLE_2D_WINDOW, "Map", &wndCbk, 30, 80, 440, 440, nullptr);
-	wndCbk.displayCallback = displayInfo;
-	wsCreateWindow(WS_STYLE_2D_WINDOW, "Info", &wndCbk, 30, 30, 440, 30, nullptr);
-	wndCbk.displayCallback = flushUnderColor;
-	wndCbk.keyboardCallback = keyCallback;
-	wsSetWindowCallbacks(WS_ROOT_WINDOW_ID, &wndCbk);
+	int id = wsCreateWindow(WS_STYLE_2D_WINDOW, "Map", 30, 80, 440, 440, nullptr);
+	wsSetWindowDisplayCallback(id, displayMap);
+	id = wsCreateWindow(WS_STYLE_2D_WINDOW, "Info", 30, 30, 440, 30, nullptr);
+	wsSetWindowDisplayCallback(id, displayInfo);
+	wsSetWindowDisplayCallback(WS_ROOT_WINDOW_ID, flushUnderColor);
+	wsSetWindowKeyboardCallback(WS_ROOT_WINDOW_ID, keyCallback);
 	#ifdef linux
     wsSetFPS(60);
 	#endif

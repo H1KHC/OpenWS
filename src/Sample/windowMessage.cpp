@@ -2,8 +2,6 @@
 #include <GL/gl.h>
 #include <openWS.h>
 
-wsWindowCallbacks wndCbk;
-
 struct windowData {
 	float theta, theta1, theta2;
 	int leftButton, rightButton, firstPress;
@@ -125,21 +123,32 @@ int main() {
 		printf("Init failed, error code: %d %s", err, wsErrorString(err));
 		return -1;
 	}
-	wndCbk.displayCallback = display;
-	wndCbk.mouseCallback = mouseButton;
-	wndCbk.cursorMoveCallback = cursorMove;
-	wndCbk.cursorEnterCallback = cursorEnter;
-	wndCbk.scrollCallback = scroll;
-	wndCbk.keyboardCallback = key;
-	wndCbk.charCallback = charC;
-	wndCbk.fileDropCallback = fileDrop;
-	wndCbk.windowMoveCallback = windowMove;
-	wndCbk.windowResizeCallback = windowResize;
-	wndCbk.windowCloseCallback = windowClose;
-	wndCbk.windowFocusCallback = windowFocus;
+	wsSetWindowDisplayCallback(WS_ROOT_WINDOW_ID, display);
+	wsSetWindowMouseButtonCallback(WS_ROOT_WINDOW_ID, mouseButton);
+	wsSetWindowCursorMoveCallback(WS_ROOT_WINDOW_ID, cursorMove);
+	wsSetWindowCursorEnterCallback(WS_ROOT_WINDOW_ID, cursorEnter);
+	wsSetWindowScrollCallback(WS_ROOT_WINDOW_ID, scroll);
+	wsSetWindowKeyboardCallback(WS_ROOT_WINDOW_ID, key);
+	wsSetWindowCharCallback(WS_ROOT_WINDOW_ID, charC);
+	wsSetWindowFileDropCallback(WS_ROOT_WINDOW_ID, fileDrop);
+	wsSetWindowMoveCallback(WS_ROOT_WINDOW_ID, windowMove);
+	wsSetWindowResizeCallback(WS_ROOT_WINDOW_ID, windowResize);
+	wsSetWindowCloseCallback(WS_ROOT_WINDOW_ID, windowClose);
+	wsSetWindowFocusCallback(WS_ROOT_WINDOW_ID, windowFocus);
 	wsSetDebugMode(WS_SDM_FULL);
-	wsSetWindowCallbacks(WS_ROOT_WINDOW_ID, &wndCbk);
 	wsSetWindowData(WS_ROOT_WINDOW_ID, new windowData);
-	wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 128, 128, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	int id = wsCreateWindow(WS_STYLE_DEFAULT, "", 128, 128, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	wsSetWindowDisplayCallback(id, display);
+	wsSetWindowMouseButtonCallback(id, mouseButton);
+	wsSetWindowCursorMoveCallback(id, cursorMove);
+	wsSetWindowCursorEnterCallback(id, cursorEnter);
+	wsSetWindowScrollCallback(id, scroll);
+	wsSetWindowKeyboardCallback(id, key);
+	wsSetWindowCharCallback(id, charC);
+	wsSetWindowFileDropCallback(id, fileDrop);
+	wsSetWindowMoveCallback(id, windowMove);
+	wsSetWindowResizeCallback(id, windowResize);
+	wsSetWindowCloseCallback(id, windowClose);
+	wsSetWindowFocusCallback(id, windowFocus);
 	wsMainLoop();
 }

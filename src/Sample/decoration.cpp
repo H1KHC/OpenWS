@@ -96,7 +96,6 @@ int key(int windowID, int key, int, int action, int) {
 
 int main() {
 	srand(time(0));
-	wsWindowCallbacks wndCbk;
     glfwWindowHint(GLFW_DEPTH_BITS, 16);
 	wsSetWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 	wsSetWindowHint(GLFW_DECORATED, GLFW_FALSE);
@@ -107,9 +106,8 @@ int main() {
 		printf("Init failed, error code: %d %s", err, wsErrorString(err));
 		return -1;
 	}
-	wndCbk.displayCallback = display;
-	wndCbk.keyboardCallback = key;
-	wsSetWindowCallbacks(WS_ROOT_WINDOW_ID, &wndCbk);
+	wsSetWindowDisplayCallback(WS_ROOT_WINDOW_ID, display);
+	wsSetWindowKeyboardCallback(WS_ROOT_WINDOW_ID, key);
 	wsSetWindowData(WS_ROOT_WINDOW_ID, new windowData);
 #if defined(__linux)
 	wsSetFPS(60);

@@ -63,20 +63,20 @@ void display(int windowID, int) {
 }
 
 int main() {
-	wsWindowCallbacks wndCbk;
-	wsSetWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
-	wsSetWindowHint(GLFW_REFRESH_RATE, 15);
 	if(!wsInit("Example", 200, 200, 512, 512)) {
 		unsigned err = wsLastError();
 		printf("Init failed, error code: %d %s", err, wsErrorString(err));
 		return -1;
 	}
 	wsSetDebugMode(WS_SDM_CURSORPOS);
-	wndCbk.displayCallback = display;
-	wsCreateWindow(WS_STYLE_DEFAULT | WS_STYLE_STATIC_WINDOW, "", &wndCbk, 0, 0, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
-	wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 0, 256, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
-	wsCreateWindow(WS_STYLE_ALIGN_LU | WS_STYLE_STATIC_WINDOW, "", &wndCbk, 256, 0, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
-	wsCreateWindow(WS_STYLE_ALIGN_LU, "", &wndCbk, 256, 256, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	int id = wsCreateWindow(WS_STYLE_DEFAULT | WS_STYLE_STATIC_WINDOW, "", 0, 0, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	wsSetWindowDisplayCallback(id, display);
+	id = wsCreateWindow(WS_STYLE_DEFAULT, "", 0, 256, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	wsSetWindowDisplayCallback(id, display);
+	id = wsCreateWindow(WS_STYLE_STATIC_WINDOW, "", 256, 0, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	wsSetWindowDisplayCallback(id, display);
+	id = wsCreateWindow(0, "", 256, 256, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	wsSetWindowDisplayCallback(id, display);
 	wsMainLoop();
 	return 0;
 }

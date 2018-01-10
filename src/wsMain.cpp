@@ -10,7 +10,7 @@
 extern int inited;
 
 inline void wsFlush() {
-	if (baseWindow->callbacks.displayCallback == nullptr) {
+	if (baseWindow->displayCallback == nullptr) {
 		glBindFramebuffer(GL_FRAMEBUFFER, baseWindow->getFramebuffer());
 		glViewport(0, 0, baseWindow->size.x, baseWindow->size.y);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -38,7 +38,7 @@ inline void wsFlush() {
 
 static bool inMainLoop = false, terminated = false;
 
-WS_API int wsTerminate() {
+int wsTerminate() {
 	if(!inMainLoop) {
 		wsSetError(WS_ERR_ILLEGAL_OPERATION);
 		return false;
@@ -82,7 +82,7 @@ void wsMain() {
 	return;
 }
 
-WS_API void wsMainLoop() {
+void wsMainLoop() {
 	if (!inited) {
 		wsSetError(WS_ERR_NOT_INITIALIZED);
 		return;

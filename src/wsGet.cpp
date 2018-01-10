@@ -24,7 +24,7 @@ extern wsWindow *currentWindow;
 		}\
 	}while(0)
 
-WS_API int wsGetForegroundWindow() {
+int wsGetForegroundWindow() {
 	wsWindow *window = baseWindow;
 	checkInit(WS_INVALID_WINDOW_ID);
 	while (window && !window->getSubWindowList()->isEmpty())
@@ -35,7 +35,7 @@ WS_API int wsGetForegroundWindow() {
 	}
 	return window->windowID;
 }
-WS_API int wsGetWindowUnderCursor() {
+int wsGetWindowUnderCursor() {
 	wsWindow *window = baseWindow;
 	checkInit(WS_INVALID_WINDOW_ID);
 	while (window && window->getWindowUnderCursor())
@@ -46,7 +46,7 @@ WS_API int wsGetWindowUnderCursor() {
 	}
 	return window->windowID;
 }
-WS_API int wsGetWindowOnPos(int x, int y) {
+int wsGetWindowOnPos(int x, int y) {
 	wsListNode<wsWindow*> *node;
 	wsWindow *window = baseWindow;
 	checkInit(WS_INVALID_WINDOW_ID);
@@ -65,7 +65,7 @@ WS_API int wsGetWindowOnPos(int x, int y) {
 	return WS_INVALID_WINDOW_ID;
 }
 
-WS_API int wsGetWindowByName(const char * name) {
+int wsGetWindowByName(const char * name) {
 	wsWindow *window;
 	checkInit(WS_INVALID_WINDOW_ID);
 	window = windowManager.findWindowByName(name);
@@ -74,14 +74,14 @@ WS_API int wsGetWindowByName(const char * name) {
 	return WS_INVALID_WINDOW_ID;
 }
 
-WS_API int wsGetWindowInfo(int windowID, wsWindowInfo * info) {
+int wsGetWindowInfo(int windowID, wsWindowInfo * info) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	if (info) *info = *window;
 	return true;
 }
 
-WS_API int wsGetFatherWindow(int windowID) {
+int wsGetFatherWindow(int windowID) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, WS_INVALID_WINDOW_ID);
 	if (window->getFather()) return window->getFather()->windowID;
@@ -89,7 +89,7 @@ WS_API int wsGetFatherWindow(int windowID) {
 	return WS_INVALID_WINDOW_ID;
 }
 
-WS_API int wsGetTopSubWindow(int windowID) {
+int wsGetTopSubWindow(int windowID) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, WS_INVALID_WINDOW_ID);
 	if (window->getSubWindowList()->isEmpty()) {
@@ -99,7 +99,7 @@ WS_API int wsGetTopSubWindow(int windowID) {
 	return window->getSubWindowList()->front()->data->windowID;
 }
 
-WS_API int wsGetPrevWindow(int windowID) {
+int wsGetPrevWindow(int windowID) {
 	wsWindow *window;
 	wsListNode<wsWindow *> *node;
 	checkInitAndFindWindow(window, windowID, false);
@@ -109,7 +109,7 @@ WS_API int wsGetPrevWindow(int windowID) {
 	return WS_INVALID_WINDOW_ID;
 }
 
-WS_API int wsGetNextWindow(int windowID) {
+int wsGetNextWindow(int windowID) {
 	wsWindow *window;
 	wsListNode<wsWindow *> *node;
 	checkInitAndFindWindow(window, windowID, false);
@@ -119,39 +119,33 @@ WS_API int wsGetNextWindow(int windowID) {
 	return WS_INVALID_WINDOW_ID;
 }
 
-WS_API int wsGetWindowCallbacks(int windowID, wsWindowCallbacks * windowCallbacks) {
-	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
-	memcpy(windowCallbacks, &window->callbacks, sizeof(wsWindowCallbacks));
-	return int();
-}
-WS_API int wsGetWindowSize(int windowID, int *w, int *h) {
+int wsGetWindowSize(int windowID, int *w, int *h) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	if (w) *w = window->size.x;
 	if (h) *h = window->size.y;
 	return true;
 }
-WS_API int wsGetWindowPos(int windowID, int *x, int *y) {
+int wsGetWindowPos(int windowID, int *x, int *y) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	if (x) *x = window->position.x;
 	if (y) *y = window->position.y;
 	return true;
 }
-WS_API int wsGetWindowStyle(int windowID, int * style) {
+int wsGetWindowStyle(int windowID, int * style) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	if (style) *style = window->styleMask;
 	return true;
 }
-WS_API int wsGetWindowData(int windowID, void **data) {
+int wsGetWindowData(int windowID, void **data) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	*data = window->userData;
 	return true;
 }
-WS_API int wsGetWindowCursorPos(int windowID, int *x, int *y) {
+int wsGetWindowCursorPos(int windowID, int *x, int *y) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	if (x) *x = window->cursorPos.x;
@@ -159,7 +153,7 @@ WS_API int wsGetWindowCursorPos(int windowID, int *x, int *y) {
 	return true;
 }
 
-WS_API GLFWwindow* wsGetGLFWWindow() {
+GLFWwindow* wsGetGLFWWindow() {
 	checkInit(nullptr);
 	return baseWindow->glfwwindow;
 }

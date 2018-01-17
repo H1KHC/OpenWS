@@ -4,6 +4,12 @@ YYYY-MM-DD {
 	- delete
 }
 
+2018-01-17 {
+	* Fixed that when you resize the window after moving it, it will return to
+		the place where it was put
+	* Changed library's name on windows os in makefile
+}
+
 2018-01-10 {
 	* changed callback function setting ports' style
 }

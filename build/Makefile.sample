@@ -1,9 +1,17 @@
 EXECUTABLES = $(patsubst $(SRC_DIR)/Sample/%.cpp, $(BIN_DIR)/%, $(wildcard $(SRC_DIR)/Sample/*.cpp))
 
-ifdef STATIC
-	SPLDFLAGS += -lopenWSs
+ifeq "$(PLATFORM)" "linux"
+	ifdef STATIC
+		SPLDFLAGS += -lopenWSs
+	else
+		SPLDFLAGS += -lopenWS
+	endif
 else
-	SPLDFLAGS += -lopenWS
+	ifdef STATIC
+		SPLDFLAGS += -lopenWS
+	else
+		SPLDFLAGS += -lopenWS.dll
+	endif
 endif
 ifeq ($(OS),Windows_NT)
 	SPLDFLAGS += -lglu32
@@ -24,7 +32,7 @@ else
 	SPCXXFLAGS += -O2
 endif
 
-sample: bin $(LIB_FULLNAME) $(EXECUTABLES)
+sample: pre $(LIB_FULLNAME) $(EXECUTABLES)
 
 $(BIN_DIR)/%: $(SRC_DIR)/Sample/%.cpp
 	g++ -o $@ $< $(SPCXXFLAGS) $(SPLDFLAGS)

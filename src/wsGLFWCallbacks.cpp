@@ -29,7 +29,7 @@ void wsWindowResizeReceiver(GLFWwindow*, int w, int h) {
 }
 
 void wsWindowMoveReceiver(GLFWwindow*, int x, int y) {
-	x = x, y = y;
+	baseWindow->windowMoveReceiver(wsCoord2{ x, y });
 }
 
 void wsWindowCloseReceiver(GLFWwindow*) {

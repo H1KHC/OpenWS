@@ -26,7 +26,7 @@ int main() {
 		printf("Init failed, error code: %d %s", err, wsErrorString(err));
 		return -1;
 	}
-	int id = wsCreateWindow(WS_STYLE_DEFAULT, "", 128, 128, 256, 256, nullptr, WS_ROOT_WINDOW_ID);
+	int id = wsCreateWindow("", 128, 128, 256, 256, nullptr, WS_ROOT_WINDOW_ID);
 	wsSetWindowDisplayCallback(id, display);
 	wsMainLoop();
 	return 0;

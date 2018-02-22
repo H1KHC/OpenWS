@@ -1,4 +1,7 @@
-PLATFORM = $(shell uname -s | perl -pe "s/(.*?)[0-9_].*/\$$1/" | tr '[:upper:]' '[:lower:]')
+BIT = 32
+STATIC = true
+
+PLATFORM = $(shell uname -s | sed "s/[^a-zA-Z].*//" | tr '[:upper:]' '[:lower:]')
 
 LDFLAGS = -m$(BIT)
 DLIBFLAGS = -fvisibility=hidden
@@ -10,8 +13,6 @@ BIN_DIR=bin
 TMP_DIR=tmp
 
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp, $(TMP_DIR)/%.o, $(wildcard $(SRC_DIR)/*.cpp))
-
-BIT = 32
 
 CXXFLAGS += $(EXTRACXXFLAGS) -std=gnu++11 -I$(INCLUDE_DIR) -m$(BIT)
 

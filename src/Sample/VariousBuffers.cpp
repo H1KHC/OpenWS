@@ -69,13 +69,13 @@ int main() {
 		return -1;
 	}
 	wsSetDebugMode(WS_SDM_CURSORPOS);
-	int id = wsCreateWindow(WS_STYLE_DEFAULT | WS_STYLE_STATIC_WINDOW, "", 0, 0, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	int id = wsCreateWindow("", 0, 0, 256, 256, new windowData, WS_STYLE_DEFAULT | WS_STYLE_STATIC_WINDOW);
 	wsSetWindowDisplayCallback(id, display);
-	id = wsCreateWindow(WS_STYLE_DEFAULT, "", 0, 256, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	id = wsCreateWindow("", 0, 256, 256, 256, new windowData);
 	wsSetWindowDisplayCallback(id, display);
-	id = wsCreateWindow(WS_STYLE_STATIC_WINDOW, "", 256, 0, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	id = wsCreateWindow("", 256, 0, 256, 256, new windowData, WS_STYLE_ALIGN_LU | WS_STYLE_STATIC_WINDOW);
 	wsSetWindowDisplayCallback(id, display);
-	id = wsCreateWindow(0, "", 256, 256, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	id = wsCreateWindow("", 256, 256, 256, 256, new windowData, WS_STYLE_ALIGN_LU, WS_ROOT_WINDOW_ID);
 	wsSetWindowDisplayCallback(id, display);
 	wsMainLoop();
 	return 0;

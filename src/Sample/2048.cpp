@@ -327,7 +327,7 @@ void check() {
 	for(int i = 0; i < 4; ++i)
 		for(int j = 0; j < 3; ++j)
 			if(Map[i][j] == Map[i][j + 1] || Map[j][i] == Map[j + 1][i]) return;
-	int id = wsCreateWindow(WS_STYLE_DEFAULT, "fail", 30, 80, 440, 440, nullptr);
+	int id = wsCreateWindow("fail", 30, 80, 440, 440, nullptr);
 	wsSetWindowDisplayCallback(id, halfopacityCovery);
 	wsSetWindowKeyboardCallback(id, failKey);
 }
@@ -445,9 +445,9 @@ int main() {
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	mapReset();
-	int id = wsCreateWindow(WS_STYLE_2D_WINDOW, "Map", 30, 80, 440, 440, nullptr);
+	int id = wsCreateWindow("Map", 30, 80, 440, 440, nullptr);
 	wsSetWindowDisplayCallback(id, displayMap);
-	id = wsCreateWindow(WS_STYLE_2D_WINDOW, "Info", 30, 30, 440, 30, nullptr);
+	id = wsCreateWindow("Info", 30, 30, 440, 30, nullptr);
 	wsSetWindowDisplayCallback(id, displayInfo);
 	wsSetWindowDisplayCallback(WS_ROOT_WINDOW_ID, flushUnderColor);
 	wsSetWindowKeyboardCallback(WS_ROOT_WINDOW_ID, keyCallback);

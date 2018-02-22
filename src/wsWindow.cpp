@@ -148,7 +148,7 @@ void wsWindow::display(int lastX, int lastY,
 		findWindow(window, id, failReturnValue);\
 	}while(0)
 
-int wsCreateWindow(int windowStyle, const char *windowName, int x, int y, int width, int height, void *windowData, int fatherWindowID) {
+int wsCreateWindow(const char *windowName, int x, int y, int width, int height, void *windowData, int windowStyle, int fatherWindowID) {
 	wsWindow *newWindow, *toBeAttached;
 	checkInitAndFindWindow(toBeAttached, fatherWindowID, WS_INVALID_WINDOW_ID);
 	newWindow = new wsWindow(windowName, wsCoord2{ x, y }, wsCoord2{ width, height }, windowStyle);

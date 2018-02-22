@@ -19,7 +19,7 @@ protected:
 	friend class wsWindowManager;
 	
 	friend int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback);
-	friend int wsCreateWindow(int windowStyle, const char *windowName, int x, int y, int width, int height, void *windowData, int fatherWindowID);
+	friend int wsCreateWindow(const char *windowName, int x, int y, int width, int height, void *windowData, int windowStyle, int fatherWindowID);
 	friend int wsAttachWindow(int subwindowID, int fatherWindowID);
 	friend int wsFocusWindow(int windowID);
 

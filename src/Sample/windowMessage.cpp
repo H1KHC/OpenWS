@@ -137,7 +137,7 @@ int main() {
 	wsSetWindowFocusCallback(WS_ROOT_WINDOW_ID, windowFocus);
 	wsSetDebugMode(WS_SDM_FULL);
 	wsSetWindowData(WS_ROOT_WINDOW_ID, new windowData);
-	int id = wsCreateWindow(WS_STYLE_DEFAULT, "", 128, 128, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	int id = wsCreateWindow("", 128, 128, 256, 256, new windowData);
 	wsSetWindowDisplayCallback(id, display);
 	wsSetWindowMouseButtonCallback(id, mouseButton);
 	wsSetWindowCursorMoveCallback(id, cursorMove);

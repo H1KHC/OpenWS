@@ -94,7 +94,7 @@ void enterC(int windowID, int) {
 
 int createWindow(int, int button, int state, int) {
 	if (button == WS_MOUSE_BUTTON_LEFT && state == WS_PRESS) {
-		int id = wsCreateWindow(WS_STYLE_ALIGN_LD, "noName", 128, 128, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+		int id = wsCreateWindow("noName", 128, 128, 256, 256, new windowData, WS_STYLE_ALIGN_LD | WS_STYLE_2D_WINDOW, WS_ROOT_WINDOW_ID);
 		wsSetWindowDisplayCallback(id, display);
 		wsSetWindowCursorMoveCallback(id, cursor);
 		wsSetWindowMouseButtonCallback(id, mouse);
@@ -125,19 +125,25 @@ int main() {
 	wsSetWindowMouseButtonCallback(WS_ROOT_WINDOW_ID, createWindow);
 	wsSetWindowCursorMoveCallback(WS_ROOT_WINDOW_ID, remPos);
 
-	id = wsCreateWindow(WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_LD, "Window1", 128, 128, 256, 256, new windowData, WS_ROOT_WINDOW_ID);
+	id = wsCreateWindow("Window1", 128, 128, 256, 256, new windowData,
+		WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_LD | WS_STYLE_2D_WINDOW,
+		WS_ROOT_WINDOW_ID);
 	wsSetWindowDisplayCallback(id, display);
 	wsSetWindowCursorMoveCallback(id, cursor);
 	wsSetWindowMouseButtonCallback(id, mouse);
 	wsSetWindowCursorEnterCallback(id, enterC);
 
-	nid = wsCreateWindow(WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_RD, "Window2", 64, 64, 128, 128, new windowData, id);
+	nid = wsCreateWindow("Window2", 64, 64, 128, 128, new windowData,
+		WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_RD | WS_STYLE_2D_WINDOW,
+		id);
 	wsSetWindowDisplayCallback(nid, display);
 	wsSetWindowCursorMoveCallback(nid, cursor);
 	wsSetWindowMouseButtonCallback(nid, mouse);
 	wsSetWindowCursorEnterCallback(nid, enterC);
 
-	id = wsCreateWindow(WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_NORESIZE, "Window3", 32, 32, 64, 64, new windowData, nid);
+	id = wsCreateWindow("Window3", 32, 32, 64, 64, new windowData,
+		WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_NORESIZE | WS_STYLE_2D_WINDOW,
+		nid);
 	wsSetWindowDisplayCallback(id, display);
 	wsSetWindowCursorMoveCallback(id, cursor);
 	wsSetWindowMouseButtonCallback(id, mouse);

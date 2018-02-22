@@ -294,7 +294,7 @@ WS_API int wsDeinit();
 
 // Default style
 #define WS_STYLE_DEFAULT				WS_STYLE_ALIGN_LU | WS_STYLE_NO_DEPTHBUFFER
-WS_API int wsCreateWindow(int windowStyle, const char *windowName, int x, int y, int width, int height, void *windowData, int fatherWindowID DEFAULT(WS_ROOT_WINDOW_ID));
+WS_API int wsCreateWindow(const char *windowName, int x, int y, int width, int height, void *windowData, int windowStyle DEFAULT(WS_STYLE_DEFAULT), int fatherWindowID DEFAULT(WS_ROOT_WINDOW_ID));
 WS_API int wsCloseWindow(int windowID);
 WS_API int wsAttachWindow(int subwindowID, int fatherWindowID);
 WS_API int wsFocusWindow(int windowID);
@@ -401,5 +401,7 @@ WS_API GLFWwindow* wsGetGLFWWindow();
 #ifdef __cplusplus
 }
 #endif
+
+#undef DEFAULT
 
 #endif

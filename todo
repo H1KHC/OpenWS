@@ -1,0 +1,21 @@
+- [ ] multiple basewindow
+    1. std::map<GLFWwindow*, wsWindow*> baseWindows
+    2. discard wsGlfwWindow, make GLFWwindow* available in every wsWindow struct
+    3. (in wsInit)
+        remove all about window creation
+    4. (in Creation)
+        if (fatherWindow == WS_ROOT_WINDOW_ID) {
+            createGLFWwindow();
+        }
+    5. (in glfwReceivers)
+        type ***receiver(GLFWwindow* window, ...) {
+            baseWindows[window]->receive();
+        }
+    6. (in get & set functions)
+        if(windowID == WS_ROOT_WINDOW_ID) {
+            wsSetError(WS_ERR_ILLEGAL_OPERATION);
+        }
+    7. (in user callback)
+        (in makeContextCurrent)
+            currentGLFWwindow check & set
+            use mutex to sync

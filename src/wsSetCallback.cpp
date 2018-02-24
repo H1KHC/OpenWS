@@ -1,7 +1,7 @@
 #include "wsWindowManager.h"
 #include <GLFW/glfw3.h>
 
-extern wsWindow *currentWindow;
+extern thread_local wsWindow *currentWindow;
 extern int inited;
 #define checkInit(failReturnValue) do {\
 		if (!inited) {\
@@ -9,24 +9,6 @@ extern int inited;
 			return (failReturnValue);\
 		}\
 	}while(0)
-
-int wsSetJoystickConnectionCallback(void(*func)(int joystickID, int joystickState)) {
-	checkInit(false);
-	glfwSetJoystickCallback(func);
-	return true;
-}
-
-static void(*iconifyCallback)(int iconified);
-void windowIconifyReceiver(GLFWwindow *, int iconified) {
-	iconifyCallback(iconified == GLFW_TRUE);
-}
-
-int wsSetWindowIconifyCallback(void(*func)(int iconified)) {
-	checkInit(false);
-	if (func)glfwSetWindowIconifyCallback(baseWindow->glfwwindow, windowIconifyReceiver);
-	else glfwSetWindowIconifyCallback(baseWindow->glfwwindow, nullptr);
-	return true;
-}
 
 #define checkInitAndFindWindow(window, id, failReturnValue) do{\
 		checkInit(failReturnValue);\
@@ -38,6 +20,30 @@ int wsSetWindowIconifyCallback(void(*func)(int iconified)) {
 			return (failReturnValue);\
 		}\
 	}while(0)
+
+int wsSetJoystickConnectionCallback(void(*func)(int joystickID, int joystickState)) {
+	checkInit(false);
+	glfwSetJoystickCallback(func);
+	return true;
+}
+
+void windowIconifyReceiver(GLFWwindow *window, int iconified) {
+	extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
+	wsWindow* wswindow = baseWindows[window];
+	wswindow->windowIconifyCallback(wswindow->windowID, iconified == GLFW_TRUE);
+}
+
+int wsSetWindowIconifyCallback(int windowID, wsWindowIconifyCallback callback) {
+	wsWindow* baseWindow;
+	checkInitAndFindWindow(baseWindow, windowID, false);
+	if(baseWindow->getFather() != nullptr) {
+		wsSetError(WS_ERR_UNIMPLEMENTED);
+		return false;
+	}
+	baseWindow->windowIconifyCallback = callback;
+	glfwSetWindowIconifyCallback(((wsBaseWindow*)baseWindow)->glfwwindow, nullptr);
+	return true;
+}
 
 int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback) {
 	wsWindow *window;

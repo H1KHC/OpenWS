@@ -15,6 +15,8 @@ static char errString[][64] = {
 	"WS_ERR_INVALID_VALUE",
 	"WS_ERR_ILLEGAL_OPERATION",
 
+	"WS_ERR_UNIMPLEMENTED",
+
 	"WS_WARN_THREAD_HAS_EXITED",
 };
 

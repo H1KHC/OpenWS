@@ -1,11 +1,11 @@
 #include "wsWindow.h"
 #include "wsWindowManager.h"
-#include "wsClock.h"
 
-wsClock *fpsClock;
-wsBaseWindow *baseWindow;
-wsWindow *currentWindow;
+// window local needed
+
+std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
+thread_local wsWindow *currentWindow, *currentBaseWindow;
 wsWindowManager windowManager;
 
-int wsError, debugOutput, wsFPS;
-int inited, fpsControl = false, wsNeedRedisplay = false;
+int wsError, debugOutput;
+int inited;

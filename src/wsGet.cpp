@@ -5,7 +5,7 @@
 #include "wsWindowManager.h"
 
 extern int inited;
-extern wsWindow *currentWindow;
+extern thread_local wsWindow *currentWindow;
 
 #define checkInit(failReturnValue) do {\
 		if (!inited) {\
@@ -25,8 +25,9 @@ extern wsWindow *currentWindow;
 	}while(0)
 
 int wsGetForegroundWindow() {
-	wsWindow *window = baseWindow;
+	extern thread_local wsWindow* currentBaseWindow;
 	checkInit(WS_INVALID_WINDOW_ID);
+	wsWindow *window = currentBaseWindow;
 	while (window && !window->getSubWindowList()->isEmpty())
 		window = window->getSubWindowList()->front()->data;
 	if (!window) {
@@ -36,8 +37,9 @@ int wsGetForegroundWindow() {
 	return window->windowID;
 }
 int wsGetWindowUnderCursor() {
-	wsWindow *window = baseWindow;
+	extern thread_local wsWindow* currentBaseWindow;
 	checkInit(WS_INVALID_WINDOW_ID);
+	wsWindow *window = currentBaseWindow;
 	while (window && window->getWindowUnderCursor())
 		window = window->getWindowUnderCursor()->data;
 	if (!window) {
@@ -47,10 +49,11 @@ int wsGetWindowUnderCursor() {
 	return window->windowID;
 }
 int wsGetWindowOnPos(int x, int y) {
-	wsListNode<wsWindow*> *node;
-	wsWindow *window = baseWindow;
+	extern thread_local wsWindow* currentBaseWindow;
 	checkInit(WS_INVALID_WINDOW_ID);
+	wsWindow *window = currentBaseWindow;
 	do {
+		wsListNode<wsWindow*> *node;
 		for (node = window->getSubWindowList()->front(); node; node = node->next) {
 			if (node->data->pointIn({x, y})) {
 				x -= node->data->position.x;
@@ -76,6 +79,10 @@ int wsGetWindowByName(const char * name) {
 
 int wsGetWindowInfo(int windowID, wsWindowInfo * info) {
 	wsWindow *window;
+	if(windowID == WS_ROOT_WINDOW_ID) {
+		wsSetError(WS_ERR_ILLEGAL_OPERATION);
+		return false;
+	}
 	checkInitAndFindWindow(window, windowID, false);
 	if (info) *info = *window;
 	return true;
@@ -83,6 +90,10 @@ int wsGetWindowInfo(int windowID, wsWindowInfo * info) {
 
 int wsGetFatherWindow(int windowID) {
 	wsWindow *window;
+	if(windowID == WS_ROOT_WINDOW_ID) {
+		wsSetError(WS_ERR_ILLEGAL_OPERATION);
+		return false;
+	}
 	checkInitAndFindWindow(window, windowID, WS_INVALID_WINDOW_ID);
 	if (window->getFather()) return window->getFather()->windowID;
 	wsSetError(WS_ERR_INVALID_VALUE);
@@ -101,9 +112,8 @@ int wsGetTopSubWindow(int windowID) {
 
 int wsGetPrevWindow(int windowID) {
 	wsWindow *window;
-	wsListNode<wsWindow *> *node;
 	checkInitAndFindWindow(window, windowID, false);
-	node = window->getThisNode();
+	wsListNode<wsWindow *> *node = window->getThisNode();
 	if (node->last) return node->last->data->windowID;
 	wsSetError(WS_ERR_WINDOW_NOT_FOUND);
 	return WS_INVALID_WINDOW_ID;
@@ -111,9 +121,8 @@ int wsGetPrevWindow(int windowID) {
 
 int wsGetNextWindow(int windowID) {
 	wsWindow *window;
-	wsListNode<wsWindow *> *node;
 	checkInitAndFindWindow(window, windowID, false);
-	node = window->getThisNode();
+	wsListNode<wsWindow *> *node = window->getThisNode();
 	if (node->next) return node->next->data->windowID;
 	wsSetError(WS_ERR_WINDOW_NOT_FOUND);
 	return WS_INVALID_WINDOW_ID;
@@ -153,9 +162,10 @@ int wsGetWindowCursorPos(int windowID, int *x, int *y) {
 	return true;
 }
 
-GLFWwindow* wsGetGLFWWindow() {
-	checkInit(nullptr);
-	return baseWindow->glfwwindow;
+GLFWwindow* wsGetGLFWWindow(int windowID) {
+	wsWindow *window;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	return window->topWindow->glfwwindow;
 }
 #undef checkInitAndFindWindow
 #undef checkInit

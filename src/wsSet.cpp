@@ -3,7 +3,7 @@
 #include "wsClock.h"
 
 extern int inited;
-extern wsWindow *currentWindow;
+extern thread_local wsWindow *currentWindow;
 
 #ifdef _DEBUG
 int wsSetDebugMode(int mode) {
@@ -35,18 +35,18 @@ int wsSetDebugMode(int mode) {
 	}while(0)
 
 
-int wsPostRedisplay() {
-	extern int wsNeedRedisplay, fpsControl;
-	extern int wsFPS;
-	checkInit(false);
-	if(fpsControl == true && wsFPS == 0) return wsNeedRedisplay = true;
+int wsPostRedisplay(int windowID) {
+	wsWindow* window;
+	checkInitAndFindWindow(window, windowID, false);
+	if(window->fpsControl == true && window->FPS == 0)
+		return window->needRedisplay = true;
 	else wsSetError(WS_ERR_ILLEGAL_OPERATION);
 	return false;
 }
 
 int wsSetSwapInterval(int interval) {
-	extern int fpsControl;
-	extern wsClock *fpsClock;
+	wsWindow* window;
+	checkInitAndFindWindow(window, windowID, false);
 	checkInit(false);
 	fpsControl = false;
 	if (fpsClock) delete fpsClock, fpsClock = nullptr;
@@ -55,13 +55,13 @@ int wsSetSwapInterval(int interval) {
 }
 
 int wsSetFPS(int fps) {
-	extern int wsFPS;
+	extern int FPS;
 	extern int fpsControl;
 	extern wsClock *fpsClock;
 	checkInit(false);
 	fpsControl = true;
 	glfwSwapInterval(0);
-	wsFPS = fps;
+	FPS = fps;
 	if (fpsClock == nullptr) {
 		fpsClock = new wsClock;
 	}

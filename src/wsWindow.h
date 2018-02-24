@@ -1,27 +1,58 @@
 #ifndef __WS_WINDOW__
 #define __WS_WINDOW__
+#include <map>
 #include <GL/glew.h>
 #include <openWS.h>
 #include <GLFW/glfw3.h>
 #include "wsList.h"
+#include "wsClock.h"
 
 void wsSetError(const int err);
 
+class wsWindow;
+typedef wsListNode<wsWindow *> wsWindowListNode;
+
+struct wsBaseWindow;
+
 typedef class wsWindow : public wsWindowInfo {
-public:
-	typedef wsListNode<wsWindow *> wsWindowListNode;
+	wsClock *fpsClock;
+	int fpsControl, FPS, needRedisplay, needRedraw;
+	bool needFlush() {
+		if (fpsControl) {
+			if (FPS) {
+				if (fpsClock->getPeriodSinceLastCall(false) * FPS <= 1000000000.0)
+					return false;
+				else {
+					fpsClock->getPeriodSinceLastCall(true);
+					return true;
+				}
+			} else {
+				if (!needRedisplay)
+					return false;
+				else {
+					needRedisplay = false;
+					return true;
+				}
+			}
+		} else return true;
+	}
 protected:
 	unsigned framebuffer, depthbuffer;
 	wsWindow *fatherWindow;
+	wsBaseWindow *topWindow;
 	wsList<wsWindow *> subWindow;
 	wsWindowListNode *windowUnderCursor, *thisWindowNode;
 
 	friend class wsWindowManager;
 	
 	friend int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback);
+	friend int wsSetWindowIconifyCallback(int windowID, wsWindowIconifyCallback callback);
 	friend int wsCreateWindow(const char *windowName, int x, int y, int width, int height, void *windowData, int windowStyle, int fatherWindowID);
 	friend int wsAttachWindow(int subwindowID, int fatherWindowID);
 	friend int wsFocusWindow(int windowID);
+	friend void wsFlush(wsWindow* baseWindow);
+	friend GLFWwindow* wsGetGLFWWindow(int windowID);
+	friend void wsMakeContextCurrent(wsWindow* window);
 
 	// Must ensure that the window is his subwindow
 	void focusWindow(wsWindowListNode *window) {
@@ -104,15 +135,9 @@ public:
 
 	void deleteWindow();
 
-	void makeContextCurrent() {
-		extern wsWindow *currentWindow;
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		glPushMatrix();
-		glViewport(0, 0, bufferSize.x, bufferSize.y);
-		currentWindow = this;
-	}
+	inline void makeContextCurrent();
 	void freeContext() {
-		extern wsWindow *currentWindow;
+		extern thread_local wsWindow *currentWindow;
 		currentWindow = nullptr;
 		glPopMatrix();
 	}
@@ -120,10 +145,23 @@ public:
 
 typedef struct wsBaseWindow : public wsWindow {
 	GLFWwindow *glfwwindow;
-	wsBaseWindow(const char *title, const wsCoord2 position, const wsCoord2 size)
-		:wsWindow(title, position, size, WS_STYLE_DEFAULT) {};
+	wsBaseWindow(const char *title, const wsCoord2 position, const wsCoord2 size, int style)
+		:wsWindow(title, position, size, style) {};
 } wsBaseWindow;
 
-extern wsBaseWindow *baseWindow;
+inline void wsWindow::makeContextCurrent() {
+	extern thread_local wsWindow *currentWindow;
+	extern thread_local wsBaseWindow *currentBaseWindow;
+	if(topWindow != currentBaseWindow) {
+		int wsInitGLEW();
+		glfwMakeContextCurrent(topWindow->glfwwindow);
+		currentBaseWindow = topWindow;
+		wsInitGLEW();
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glPushMatrix();
+	glViewport(0, 0, bufferSize.x, bufferSize.y);
+	currentWindow = this;
+}
 
 #endif

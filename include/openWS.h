@@ -187,7 +187,7 @@ typedef void(*wsWindowMoveCallback)		(int windowID, int x, int y);
 typedef void(*wsWindowResizeCallback)	(int windowID, int w, int h);
 typedef void(*wsWindowCloseCallback)	(int windowID);
 typedef void(*wsWindowFocusCallback)	(int windowID, int focused);
-
+typedef void(*wsWindowIconifyCallback)	(int windowID, int iconified);
 typedef struct wsCoord2 {
 	int x, y;
 } wsCoord2;
@@ -213,6 +213,7 @@ typedef struct wsWindowInfo {
 	wsWindowResizeCallback windowResizeCallback;
 	wsWindowCloseCallback windowCloseCallback;
 	wsWindowFocusCallback windowFocusCallback;
+	wsWindowIconifyCallback windowIconifyCallback;
 	void *userData;
 } wsWindowInfo;
 
@@ -235,6 +236,9 @@ enum {
 	//FUNCTION CALL
 	WS_ERR_INVALID_VALUE,
 	WS_ERR_ILLEGAL_OPERATION,
+
+	//FUNCTIONAL
+	WS_ERR_UNIMPLEMENTED,
 
 	//WARNINGS
 	WS_WARN_THREAD_HAS_EXITED,
@@ -265,7 +269,7 @@ enum {
 
 // Initialize the openWS library
 WS_API int wsSetWindowHint(int hint, int value);
-WS_API int wsInit(const char *title, int x, int y, int width, int height);
+WS_API int wsInit();
 // Deinitialize the openWS library
 WS_API int wsDeinit();
 
@@ -324,12 +328,12 @@ WS_API int wsGetWindowInfo(int windowID, wsWindowInfo *info);
 
 //Global set functions
 
-WS_API int wsPostRedisplay();
-WS_API int wsSetSwapInterval(int interval);
-WS_API int wsSetFPS(int fps);
+WS_API int wsPostRedisplay(int window);
+WS_API int wsSetSwapInterval(int window, int interval);
+WS_API int wsSetFPS(int window, int fps);
 
 WS_API int wsSetJoystickConnectionCallback(void(*func)(int joystickID, int joystickState));
-WS_API int wsSetWindowIconifyCallback(void(*func)(int iconified));
+WS_API int wsSetWindowIconifyCallback(int windowID, wsWindowIconifyCallback callback);
 
 #if defined(_DEBUG) || defined(__DEBUG__)
 #define WS_SDM_CLOSE				0x00000000
@@ -396,7 +400,11 @@ WS_API void wsMainLoop();
 WS_API int wsTerminate();
 
 struct GLFWwindow;
-WS_API GLFWwindow* wsGetGLFWWindow();
+/***
+  * get glfwwindow of specificated wswindow
+  * if windowID is WS_ROOT_WINDOW_ID, then returns the foreground one's
+***/
+WS_API GLFWwindow* wsGetGLFWWindow(int windowID DEFAULT(WS_ROOT_WINDOW_ID));
 
 #ifdef __cplusplus
 }

@@ -15,7 +15,7 @@ public:
 			IDRecycler.deleteFront();
 			return t;
 		}
-		if (windowMap.empty()) return 0;
+		if (windowMap.empty()) return 1;
 		return (--(windowMap.end()))->first + 1;
 	}
 	void registerWindow(wsWindow *window) {

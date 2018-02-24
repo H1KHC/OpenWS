@@ -1,15 +1,8 @@
-#if defined(_WIN32)
-#include <Windows.h>
-#define DELAY(x) Sleep(x)
-#else
-#include <unistd.h>
-#define DELAY(x) usleep((x)*1000)
-#endif
 #include "wsWindow.h"
 #include "wsClock.h"
 extern int inited;
 
-inline void wsFlush() {
+inline void wsFlush(wsBaseWindow* baseWindow) {
 	if (baseWindow->displayCallback == nullptr) {
 		glBindFramebuffer(GL_FRAMEBUFFER, baseWindow->getFramebuffer());
 		glViewport(0, 0, baseWindow->size.x, baseWindow->size.y);
@@ -48,35 +41,28 @@ int wsTerminate() {
 }
 
 void wsMain() {
-	extern int fpsControl, wsNeedRedisplay;
-	extern wsClock *fpsClock;
-	extern int wsFPS;
+	extern thread_local wsWindow* currentBaseWindow;
+	extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	while (true) {
-		if (!baseWindow || glfwWindowShouldClose(baseWindow->glfwwindow) || terminated)
-			break;
-
-		do {
-			if (fpsControl) {
-				if (wsFPS) {
-					if (fpsClock->getPeriodSinceLastCall(false) * wsFPS <= 1000000000.0) {
-						DELAY(0);
-						break;
-					}
-					else fpsClock->getPeriodSinceLastCall(true);
-				}
-				else {
-					if (!wsNeedRedisplay) {
-						DELAY(0);
-						break;
-					}
-					else wsNeedRedisplay = false;
-				}
+	while (baseWindows.size()) {
+		for(auto windowPair = baseWindows.begin(), _end = baseWindows.end();
+			windowPair != _end; ) {
+			wsBaseWindow* baseWindow = windowPair->second;
+			if (!baseWindow || glfwWindowShouldClose(windowPair->first) || terminated) {
+				windowPair = baseWindows.erase(windowPair);
+				continue;
 			}
-			wsFlush();
-		} while (0);
+			if(currentBaseWindow != baseWindow) {
+				int wsInitGLEW();
+				glfwMakeContextCurrent(windowPair->first);
+				currentBaseWindow = baseWindow;
+				wsInitGLEW();
+			}
 
+			wsFlush(baseWindow);
+			++windowPair;
+		}
 		glfwPollEvents();
 	}
 	return;

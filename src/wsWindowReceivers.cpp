@@ -1,7 +1,7 @@
 #include "wsWindow.h"
 
 void wsWindow::displayReceiver() {
-	if (!(styleMask & WS_STYLE_NODISPLAY) && displayCallback) {
+	if (!(styleMask & WS_STYLE_NODISPLAY) && displayCallback && needFlush()) {
 		makeContextCurrent();
 		displayCallback(windowID, framebuffer);
 		freeContext();
@@ -9,17 +9,20 @@ void wsWindow::displayReceiver() {
 		// In order to avoid the issue that all the colors except blue will
 		//  be erased in the subwindow on some machine
 		glColor3f(1.0f, 1.0f, 1.0f);
+
+		needRedraw = true;
 	}
 	for (wsWindowListNode *node = subWindow.front(); node; node = node->next) {
 		node->data->displayReceiver();
+		if(node->data->needRedraw) needRedraw = true;
 	}
 }
 int wsWindow::keyboardReceiver(int key, int scancode, int action, int mods) {
 	if (subWindow.isEmpty() || !subWindow.front()->data->focused || subWindow.front()->data->keyboardReceiver(key, scancode, action, mods)) {
 
 		// In order to avoid the problem that when user closes a window's fatherwindow, and returns
-		//	that the event should be pushed up, his father will access its member, by when the
-		//	program will be crashed caused by segmentation fault
+		//	that the event should be pushed up, his father will access its member variables, by when
+		//	the program will be crashed caused by segmentation fault, as its father has been free
 		if(!this) return false;
 
 		if (keyboardCallback) {
@@ -144,11 +147,9 @@ void wsWindow::windowResizeReceiver(wsCoord2 newSize) {
 								node->data->position.y += deltaSize.y; break;
 		}
 	}
-	if(windowID == WS_ROOT_WINDOW_ID) {
-		glfwSetWindowPos(((wsBaseWindow*)this)->glfwwindow,
-							position.x, position.y);
-		glfwSetWindowSize(((wsBaseWindow*)this)->glfwwindow,
-							size.x, size.y);
+	if(fatherWindow == nullptr) {
+		glfwSetWindowPos(((wsBaseWindow*)this)->glfwwindow, position.x, position.y);
+		glfwSetWindowSize(((wsBaseWindow*)this)->glfwwindow, size.x, size.y);
 	}
 	if (windowResizeCallback) {
 		makeContextCurrent();
@@ -158,9 +159,8 @@ void wsWindow::windowResizeReceiver(wsCoord2 newSize) {
 }
 void wsWindow::windowMoveReceiver(wsCoord2 newPos) {
 	position = newPos;
-	if(windowID == WS_ROOT_WINDOW_ID) {
-		glfwSetWindowPos(((wsBaseWindow*)this)->glfwwindow,
-							position.x, position.y);
+	if(fatherWindow == nullptr) {
+		glfwSetWindowPos(((wsBaseWindow*)this)->glfwwindow, position.x, position.y);
 	}
 	if (windowMoveCallback) {
 		makeContextCurrent();

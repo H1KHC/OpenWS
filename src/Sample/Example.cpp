@@ -1,3 +1,4 @@
+#define WS_STATIC
 #include <stdio.h>
 #include <GL/gl.h>
 #include <openWS.h>
@@ -21,13 +22,11 @@ void display(int, int) {
 }
 
 int main() {
-	if(!wsInit("Example", 200, 200, 512, 512)) {
-		unsigned err = wsLastError();
-		printf("Init failed, error code: %d %s", err, wsErrorString(err));
-		return -1;
-	}
-	int id = wsCreateWindow("", 128, 128, 256, 256, nullptr, WS_ROOT_WINDOW_ID);
-	wsSetWindowDisplayCallback(id, display);
+	int root, sub;
+	wsInit();
+	root = wsCreateWindow("Example", 200, 200, 512, 512, nullptr);
+	sub = wsCreateWindow("Triangle", 128, 128, 256, 256, nullptr, WS_STYLE_DEFAULT, root);
+	wsSetWindowDisplayCallback(sub, display);
 	wsMainLoop();
 	return 0;
 }

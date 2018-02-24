@@ -13,6 +13,8 @@
 #include <GLFW/glfw3native.h>
 #include <openWS.h>
 
+int windowID;
+
 struct windowData {
 	bool onMove, fast, slow, speedUp, speedDown, randomForce;
 	int horizontal, vertical, onPress, tick, randTime;
@@ -49,7 +51,7 @@ void display(int windowID, int) {
 		int delta = (data->fast ? 10 : (data->slow ? 1 : 5)),
 			x = data->horizontal * delta,
 			y = data->vertical * delta;
-		wsSetWindowPos(WS_ROOT_WINDOW_ID, x, y, WS_SWP_RELATIVE);
+		wsSetWindowPos(windowID, x, y, WS_SWP_RELATIVE);
 	}
 	int ds = data->speedUp - data->speedDown;
 	if(ds) {
@@ -96,19 +98,15 @@ int key(int windowID, int key, int, int action, int) {
 
 int main() {
 	srand(time(0));
-    glfwWindowHint(GLFW_DEPTH_BITS, 16);
+	wsInit();
+	glfwWindowHint(GLFW_DEPTH_BITS, 16);
 	wsSetWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 	wsSetWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	wsSetWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	wsSetWindowHint(GLFW_FLOATING, GLFW_TRUE);
-	if(!wsInit("Example", 200, 200, 256, 256)) {
-		unsigned err = wsLastError();
-		printf("Init failed, error code: %d %s", err, wsErrorString(err));
-		return -1;
-	}
-	wsSetWindowDisplayCallback(WS_ROOT_WINDOW_ID, display);
-	wsSetWindowKeyboardCallback(WS_ROOT_WINDOW_ID, key);
-	wsSetWindowData(WS_ROOT_WINDOW_ID, new windowData);
+	windowID = wsCreateWindow("Example", 200, 200, 256, 256, new windowData);
+	wsSetWindowDisplayCallback(windowID, display);
+	wsSetWindowKeyboardCallback(windowID, key);
 #if defined(__linux)
 	wsSetFPS(60);
 	XShapeCombineRectangles(glfwGetX11Display(), glfwGetX11Window(wsGetGLFWWindow()), ShapeInput, 0, 0, NULL, 0, ShapeSet, YXBanded);

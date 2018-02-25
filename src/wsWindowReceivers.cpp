@@ -1,5 +1,12 @@
 #include "wsWindow.h"
 
+// This pointer nunnull check is needed in order to avoid the problem that when
+// user closes a window's fatherwindow, and returns that the event should be
+// pushed up, his father will access its member variables, by when the program
+// will segfault, as its father has been deleted
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnonnull-compare"
+
 void wsWindow::displayReceiver() {
 	if (!(styleMask & WS_STYLE_NODISPLAY) && displayCallback && needFlush()) {
 		makeContextCurrent();
@@ -20,9 +27,6 @@ void wsWindow::displayReceiver() {
 int wsWindow::keyboardReceiver(int key, int scancode, int action, int mods) {
 	if (subWindow.isEmpty() || !subWindow.front()->data->focused || subWindow.front()->data->keyboardReceiver(key, scancode, action, mods)) {
 
-		// In order to avoid the problem that when user closes a window's fatherwindow, and returns
-		//	that the event should be pushed up, his father will access its member variables, by when
-		//	the program will be crashed caused by segmentation fault, as its father has been free
 		if(!this) return false;
 
 		if (keyboardCallback) {
@@ -186,3 +190,5 @@ void wsWindow::windowFocusReceiver(int focus) {
 		freeContext();
 	}
 }
+
+#pragma GCC diagnostic pop

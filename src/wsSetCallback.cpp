@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include "checkInitAndFindWindow.h"
 
-int wsSetJoystickConnectionCallback(void(*func)(int joystickID, int joystickState)) {
+int wsSetJoystickCallback(wsJoystickCallback func) {
 	checkInit(false);
 	glfwSetJoystickCallback(func);
 	return true;
@@ -41,55 +41,55 @@ int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback) {
 	}
 	return true;
 }
-int wsSetWindowMouseButtonCallback(int windowID, wsMouseButtonCallback callback) {
+int wsSetMouseButtonCallback(int windowID, wsMouseButtonCallback callback) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->mouseButtonCallback = callback;
 	return true;
 }
-int wsSetWindowCursorMoveCallback(int windowID, wsCursorMoveCallback callback) {
+int wsSetCursorPosCallback(int windowID, wsCursorPosCallback callback) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->cursorMoveCallback = callback;
 	return true;
 }
-int wsSetWindowCursorEnterCallback(int windowID, wsCursorEnterCallback callback) {
+int wsSetCursorEnterCallback(int windowID, wsCursorEnterCallback callback) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->cursorEnterCallback = callback;
 	return true;
 }
-int wsSetWindowScrollCallback(int windowID, wsScrollCallback callback) {
+int wsSetScrollCallback(int windowID, wsScrollCallback callback) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->scrollCallback = callback;
 	return true;
 }
-int wsSetWindowKeyboardCallback(int windowID, wsKeyboardCallback callback) {
+int wsSetKeyCallback(int windowID, wsKeyCallback callback) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->keyboardCallback = callback;
 	return true;
 }
-int wsSetWindowCharCallback(int windowID, wsCharCallback callback) {
+int wsSetCharModsCallback(int windowID, wsCharModsCallback callback) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->charCallback = callback;
 	return true;
 }
-int wsSetWindowFileDropCallback(int windowID, wsFileDropCallback callback) {
+int wsSetDropCallback(int windowID, wsFileDropCallback callback) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->fileDropCallback = callback;
 	return true;
 }
-int wsSetWindowMoveCallback(int windowID, wsWindowMoveCallback callback) {
+int wsSetWindowPosCallback(int windowID, wsWindowPosCallback callback) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->windowMoveCallback = callback;
 	return true;
 }
-int wsSetWindowResizeCallback(int windowID, wsWindowResizeCallback callback) {
+int wsSetWindowSizeCallback(int windowID, wsWindowsizeCallback callback) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->windowResizeCallback = callback;

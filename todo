@@ -39,7 +39,7 @@
                 [ ] check if(needRedisplay) then display
     [-] check all currentBaseWindow changing function
         to prevent Context change in display (currently only single thread)
-    [ ] wsTerminate(add param force: do not wait for other threads)
+    [-] wsTerminate(add param force: do not wait for other threads)
     [ ] wsGetTopWindow(int windowID)
     [ ] wsBaseWindow contextInUsing
     [ ] pushdown tags in receivers

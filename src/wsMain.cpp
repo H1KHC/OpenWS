@@ -35,13 +35,10 @@ inline void wsFlush(wsBaseWindow* baseWindow) {
 
 static bool inMainLoop = false, terminated = false;
 
-int wsTerminate() {
+void wsTerminate(void) {
 	if(!inMainLoop) {
 		wsSetError(WS_ERR_ILLEGAL_OPERATION);
-		return false;
-	}
-	terminated = true;
-	return true;
+	} else terminated = true;
 }
 
 void wsMain() {
@@ -71,6 +68,7 @@ void wsMain() {
 			glfwSetWindowShouldClose(windowPair->first, GLFW_TRUE);
 			glfwPollEvents();
 		}
+		glfwTerminate();
 	}
 	return;
 }

@@ -49,7 +49,7 @@ void display(int windowID, int) {
 	int w, h;
 	windowData *data;
 	glEnable(GL_DEPTH_TEST);
-	wsGetWindowData(windowID, (void **)&data);
+	wsGetWindowUserPointer(windowID, (void **)&data);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	wsGetWindowSize(windowID, &w, &h);

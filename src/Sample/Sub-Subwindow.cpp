@@ -15,7 +15,7 @@ struct windowData {
 
 void display(int windowID, int) {
 	windowData *data;
-	wsGetWindowData(windowID, (void **)&data);
+	wsGetWindowUserPointer(windowID, (void **)&data);
 	glClearColor(0.0f, 0.1f, 0.3f, 0.5f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
@@ -45,14 +45,14 @@ void display(int windowID, int) {
 }
 int remPos(int windowID, int xpos, int ypos) {
 	windowData *data;
-	wsGetWindowData(windowID, (void **)&data);
+	wsGetWindowUserPointer(windowID, (void **)&data);
 	data->lastx = xpos;
 	data->lasty = ypos;
 	return 0;
 }
 int cursor(int windowID, int xpos, int ypos) {
 	windowData *data;
-	wsGetWindowData(windowID, (void **)&data);
+	wsGetWindowUserPointer(windowID, (void **)&data);
 	if (data->pressed) {
 		if ((int)xpos != data->lastx || ypos != data->lasty) {
 			if (data->lastx >= 0)
@@ -77,7 +77,7 @@ int cursor(int windowID, int xpos, int ypos) {
 
 int mouse(int windowID, int button, int state, int) {
 	windowData *data;
-	wsGetWindowData(windowID, (void **)&data);
+	wsGetWindowUserPointer(windowID, (void **)&data);
 	if (button == WS_MOUSE_BUTTON_LEFT) {
 		data->pressed = (state != WS_RELEASE);
 	}
@@ -90,7 +90,7 @@ int mouse(int windowID, int button, int state, int) {
 
 void enterC(int windowID, int) {
 	windowData *data;
-	wsGetWindowData(windowID, (void **)&data);
+	wsGetWindowUserPointer(windowID, (void **)&data);
 	data->pressed = data->rpressed = false;
 }
 
@@ -98,16 +98,16 @@ int createWindow(int, int button, int state, int) {
 	if (button == WS_MOUSE_BUTTON_LEFT && state == WS_PRESS) {
 		int id = wsCreateWindow("noName", 128, 128, 256, 256, new windowData, WS_STYLE_ALIGN_LD | WS_STYLE_2D_WINDOW, rootWindow);
 		wsSetWindowDisplayCallback(id, display);
-		wsSetWindowCursorMoveCallback(id, cursor);
-		wsSetWindowMouseButtonCallback(id, mouse);
-		wsSetWindowCursorEnterCallback(id, enterC);
+		wsSetCursorPosCallback(id, cursor);
+		wsSetMouseButtonCallback(id, mouse);
+		wsSetCursorEnterCallback(id, enterC);
 	}
 	return 0;
 }
 
 void recycle(int windowID) {
 	windowData *data;
-	wsGetWindowData(windowID, (void **)&data);
+	wsGetWindowUserPointer(windowID, (void **)&data);
 	delete data;
 }
 
@@ -121,32 +121,32 @@ int main() {
 	rootWindow = wsCreateWindow("wsDemo", 200, 200, 512, 512, new windowData, WS_STYLE_DEFAULT | WS_STYLE_ALIGN_LD);
 	wsSetDebugMode(WS_SDM_FULL);
 	wsSetWindowCloseCallback(rootWindow, recycle);
-	wsSetWindowMouseButtonCallback(rootWindow, createWindow);
-	wsSetWindowCursorMoveCallback(rootWindow, remPos);
+	wsSetMouseButtonCallback(rootWindow, createWindow);
+	wsSetCursorPosCallback(rootWindow, remPos);
 
 	id = wsCreateWindow("Window1", 128, 128, 256, 256, new windowData,
 		WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_LD | WS_STYLE_2D_WINDOW,
 		rootWindow);
 	wsSetWindowDisplayCallback(id, display);
-	wsSetWindowCursorMoveCallback(id, cursor);
-	wsSetWindowMouseButtonCallback(id, mouse);
-	wsSetWindowCursorEnterCallback(id, enterC);
+	wsSetCursorPosCallback(id, cursor);
+	wsSetMouseButtonCallback(id, mouse);
+	wsSetCursorEnterCallback(id, enterC);
 
 	nid = wsCreateWindow("Window2", 64, 64, 128, 128, new windowData,
 		WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_RD | WS_STYLE_2D_WINDOW,
 		id);
 	wsSetWindowDisplayCallback(nid, display);
-	wsSetWindowCursorMoveCallback(nid, cursor);
-	wsSetWindowMouseButtonCallback(nid, mouse);
-	wsSetWindowCursorEnterCallback(nid, enterC);
+	wsSetCursorPosCallback(nid, cursor);
+	wsSetMouseButtonCallback(nid, mouse);
+	wsSetCursorEnterCallback(nid, enterC);
 
 	id = wsCreateWindow("Window3", 32, 32, 64, 64, new windowData,
 		WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_NORESIZE | WS_STYLE_2D_WINDOW,
 		nid);
 	wsSetWindowDisplayCallback(id, display);
-	wsSetWindowCursorMoveCallback(id, cursor);
-	wsSetWindowMouseButtonCallback(id, mouse);
-	wsSetWindowCursorEnterCallback(id, enterC);
+	wsSetCursorPosCallback(id, cursor);
+	wsSetMouseButtonCallback(id, mouse);
+	wsSetCursorEnterCallback(id, enterC);
 
 	wsMainLoop();
 	return 0;

@@ -15,7 +15,7 @@ struct windowData {
 
 void display(int windowID, int) {
 	windowData *data;
-	wsGetWindowData(windowID, (void **)&data);
+	wsGetWindowUserPointer(windowID, (void **)&data);
 	glClearColor(0.0f, 0.1f, 0.3f, 0.5f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
@@ -38,14 +38,14 @@ void display(int windowID, int) {
 
 int mouseButton(int windowID, int button, int action, int mods) {
 	windowData *data;
-	wsGetWindowData(windowID, (void **)&data);
+	wsGetWindowUserPointer(windowID, (void **)&data);
 	if(windowID) {
 	 	if(button == WS_MOUSE_BUTTON_LEFT) data->leftButton = data->firstPress = action;
 	 	else if(button == WS_MOUSE_BUTTON_RIGHT) data->rightButton = data->firstPress = action;
 	//	else if(button == WS_MOUSE_BUTTON_MIDDLE) wsCloseWindow(windowID);
 	} else if(button == WS_MOUSE_BUTTON_LEFT && action) {
 	//	int id = wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 128, 128, 256, 256, rootWindow);
-	//	wsSetWindowData(id, new windowData);
+	//	wsSetWindowUserPointer(id, new windowData);
 	}
 	printf("Mouse.button: Window %d, button %d, action %d, mods %d\n", windowID, button, action, mods);
 	return 0;
@@ -54,7 +54,7 @@ int mouseButton(int windowID, int button, int action, int mods) {
 int cursorMove(int windowID, int xpos, int ypos) {
 	if(windowID) {
 		windowData *data;
-		wsGetWindowData(windowID, (void **)&data);
+		wsGetWindowUserPointer(windowID, (void **)&data);
 		if(data->firstPress) {
 			data->firstPress = false;
 			data->x = xpos, data->y = ypos;
@@ -76,7 +76,7 @@ void cursorEnter(int windowID, int entered) {
 	printf("cursor.enter: Window %d, entered %d\n", windowID, entered);
 	if(windowID && !entered) {
 		windowData *data;
-		wsGetWindowData(windowID, (void **)&data);
+		wsGetWindowUserPointer(windowID, (void **)&data);
 		data->leftButton = (data->rightButton = 0);
 	}
 }
@@ -127,30 +127,30 @@ int main() {
 	}
 	rootWindow = wsCreateWindow("messages", 200, 200, 512, 512, new windowData);
 	wsSetWindowDisplayCallback(rootWindow, display);
-	wsSetWindowMouseButtonCallback(rootWindow, mouseButton);
-	wsSetWindowCursorMoveCallback(rootWindow, cursorMove);
-	wsSetWindowCursorEnterCallback(rootWindow, cursorEnter);
-	wsSetWindowScrollCallback(rootWindow, scroll);
-	wsSetWindowKeyboardCallback(rootWindow, key);
-	wsSetWindowCharCallback(rootWindow, charC);
-	wsSetWindowFileDropCallback(rootWindow, fileDrop);
-	wsSetWindowMoveCallback(rootWindow, windowMove);
-	wsSetWindowResizeCallback(rootWindow, windowResize);
+	wsSetMouseButtonCallback(rootWindow, mouseButton);
+	wsSetCursorPosCallback(rootWindow, cursorMove);
+	wsSetCursorEnterCallback(rootWindow, cursorEnter);
+	wsSetScrollCallback(rootWindow, scroll);
+	wsSetKeyCallback(rootWindow, key);
+	wsSetCharModsCallback(rootWindow, charC);
+	wsSetDropCallback(rootWindow, fileDrop);
+	wsSetWindowPosCallback(rootWindow, windowMove);
+	wsSetWindowSizeCallback(rootWindow, windowResize);
 	wsSetWindowCloseCallback(rootWindow, windowClose);
 	wsSetWindowFocusCallback(rootWindow, windowFocus);
 	wsSetDebugMode(WS_SDM_FULL);
-	wsSetWindowData(rootWindow, new windowData);
+	wsSetWindowUserPointer(rootWindow, new windowData);
 	int id = wsCreateWindow("", 128, 128, 256, 256, new windowData, WS_STYLE_DEFAULT, rootWindow);
 	wsSetWindowDisplayCallback(id, display);
-	wsSetWindowMouseButtonCallback(id, mouseButton);
-	wsSetWindowCursorMoveCallback(id, cursorMove);
-	wsSetWindowCursorEnterCallback(id, cursorEnter);
-	wsSetWindowScrollCallback(id, scroll);
-	wsSetWindowKeyboardCallback(id, key);
-	wsSetWindowCharCallback(id, charC);
-	wsSetWindowFileDropCallback(id, fileDrop);
-	wsSetWindowMoveCallback(id, windowMove);
-	wsSetWindowResizeCallback(id, windowResize);
+	wsSetMouseButtonCallback(id, mouseButton);
+	wsSetCursorPosCallback(id, cursorMove);
+	wsSetCursorEnterCallback(id, cursorEnter);
+	wsSetScrollCallback(id, scroll);
+	wsSetKeyCallback(id, key);
+	wsSetCharModsCallback(id, charC);
+	wsSetDropCallback(id, fileDrop);
+	wsSetWindowPosCallback(id, windowMove);
+	wsSetWindowSizeCallback(id, windowResize);
 	wsSetWindowCloseCallback(id, windowClose);
 	wsSetWindowFocusCallback(id, windowFocus);
 	wsMainLoop();

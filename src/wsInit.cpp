@@ -31,33 +31,10 @@ int wsInitGLEW() {
 #undef RETARGET
 	return true;
 }
-int wsInit() {
+int wsInit(void) {
 	extern int inited;
 	if (!wsInitGLFW())
 		return false;
-//	if (!wsInitGLEW())
-//		return false;
 	inited = true;
-	return true;
-}
-
-int wsDeinit() {
-	extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
-	extern int inited;
-	if (!inited) {
-		wsSetError(WS_ERR_NOT_INITIALIZED);
-		return false;
-	}
-
-	if (baseWindows.size()) {
-		for(auto baseWindow = baseWindows.begin(); baseWindows.size();) {
-			if(baseWindow->second) baseWindow->second->deleteWindow();
-			baseWindow = baseWindows.erase(baseWindow);
-		}
-	}
-
-	glfwTerminate();
-
-	inited = false;
 	return true;
 }

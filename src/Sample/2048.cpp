@@ -332,7 +332,7 @@ void check() {
 			if(Map[i][j] == Map[i][j + 1] || Map[j][i] == Map[j + 1][i]) return;
 	int id = wsCreateWindow("fail", 30, 80, 440, 440, nullptr, WS_STYLE_DEFAULT, rootWindow);
 	wsSetWindowDisplayCallback(id, halfopacityCovery);
-	wsSetWindowKeyboardCallback(id, failKey);
+	wsSetKeyCallback(id, failKey);
 }
 void mapUp() {
 	bool updated = false;
@@ -454,7 +454,7 @@ int main() {
 	id = wsCreateWindow("Info", 30, 30, 440, 30, nullptr, WS_STYLE_DEFAULT, rootWindow);
 	wsSetWindowDisplayCallback(id, displayInfo);
 	wsSetWindowDisplayCallback(rootWindow, flushUnderColor);
-	wsSetWindowKeyboardCallback(rootWindow, keyCallback);
+	wsSetKeyCallback(rootWindow, keyCallback);
 	#ifdef linux
 	wsSetFPS(60);
 	#endif

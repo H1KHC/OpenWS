@@ -39,7 +39,7 @@ inline void draw() {
 
 void display(int windowID, int) {
 	windowData* data;
-	wsGetWindowData(windowID, (void**)&data);
+	wsGetWindowUserPointer(windowID, (void**)&data);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.5f * (0 < data->onPress));
 	glClear(GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
@@ -73,7 +73,7 @@ void display(int windowID, int) {
 
 int key(int windowID, int key, int, int action, int) {
 	windowData* data;
-	wsGetWindowData(windowID, (void**)&data);
+	wsGetWindowUserPointer(windowID, (void**)&data);
 	if(key == WS_KEY_ESCAPE) {
 		wsTerminate();
 		return 0;
@@ -99,14 +99,14 @@ int key(int windowID, int key, int, int action, int) {
 int main() {
 	srand(time(0));
 	wsInit();
-	wsSetWindowHint(GLFW_DEPTH_BITS, 16);
-	wsSetWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
-	wsSetWindowHint(GLFW_DECORATED, GLFW_FALSE);
-	wsSetWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	wsSetWindowHint(GLFW_FLOATING, GLFW_TRUE);
+	wsWindowHint(GLFW_DEPTH_BITS, 16);
+	wsWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+	wsWindowHint(GLFW_DECORATED, GLFW_FALSE);
+	wsWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	wsWindowHint(GLFW_FLOATING, GLFW_TRUE);
 	windowID = wsCreateWindow("Example", 200, 200, 256, 256, new windowData);
 	wsSetWindowDisplayCallback(windowID, display);
-	wsSetWindowKeyboardCallback(windowID, key);
+	wsSetKeyCallback(windowID, key);
 #if defined(__linux)
 	wsSetFPS(60);
 	XShapeCombineRectangles(glfwGetX11Display(), glfwGetX11Window(wsGetGLFWWindow()), ShapeInput, 0, 0, NULL, 0, ShapeSet, YXBanded);

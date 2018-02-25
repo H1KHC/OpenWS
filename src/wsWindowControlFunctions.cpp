@@ -2,7 +2,7 @@
 #include "wsWindowManager.h"
 #include "checkInitAndFindWindow.h"
 
-int wsCreateWindow(const char *windowName, int x, int y, int width, int height,
+int wsCreateWindow(const char *title, int x, int y, int width, int height,
 				   void *windowData, int windowStyle, int fatherWindowID) {
 	extern thread_local wsBaseWindow* currentBaseWindow;
 	extern thread_local wsWindow* currentWindow;
@@ -13,7 +13,7 @@ int wsCreateWindow(const char *windowName, int x, int y, int width, int height,
 		int createGLFWwindow(wsBaseWindow*);
 
 		wsBaseWindow *newWindow =
-			new wsBaseWindow(windowName,
+			new wsBaseWindow(title,
 							 wsCoord2{ x, y },
 							 wsCoord2{ width, height },
 							 windowStyle);
@@ -45,7 +45,7 @@ int wsCreateWindow(const char *windowName, int x, int y, int width, int height,
 		wsWindow *toBeAttached, *newWindow;
 		findWindow(toBeAttached, fatherWindowID, WS_INVALID_WINDOW_ID);
 
-		newWindow = new wsWindow(windowName,
+		newWindow = new wsWindow(title,
 								 wsCoord2{ x, y },
 								 wsCoord2{ width, height },
 								 windowStyle);

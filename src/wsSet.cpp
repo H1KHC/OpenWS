@@ -185,7 +185,7 @@ int wsSetWindowStyle(int windowID, int style, int mode) {
 	}
 	return true;
 }
-int wsSetWindowData(int windowID, void * data) {
+int wsSetWindowUserPointer(int windowID, void * data) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	window->userData = data;

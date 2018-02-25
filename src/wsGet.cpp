@@ -131,7 +131,7 @@ int wsGetWindowStyle(int windowID, int * style) {
 	if (style) *style = window->styleMask;
 	return true;
 }
-int wsGetWindowData(int windowID, void **data) {
+int wsGetWindowUserPointer(int windowID, void **data) {
 	wsWindow *window;
 	checkInitAndFindWindow(window, windowID, false);
 	*data = window->userData;

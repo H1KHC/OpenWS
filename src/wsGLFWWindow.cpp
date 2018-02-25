@@ -77,9 +77,8 @@ void wsFileDropReceiver(GLFWwindow* window, int count, const char **filename) {
 
 struct windowHintData { int hint, value; };
 static wsList<windowHintData> windowHintLists;
-int wsSetWindowHint(int hint, int value) {
+void wsWindowHint(int hint, int value) {
 	windowHintLists.addBack(windowHintData{hint, value});
-	return true;
 }
 
 int createGLFWwindow(wsBaseWindow* window) {

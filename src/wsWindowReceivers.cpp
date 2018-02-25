@@ -10,11 +10,11 @@ void wsWindow::displayReceiver() {
 		//  be erased in the subwindow on some machine
 		glColor3f(1.0f, 1.0f, 1.0f);
 
-		needRedraw = true;
+		needRedisplay = true;
 	}
 	for (wsWindowListNode *node = subWindow.front(); node; node = node->next) {
 		node->data->displayReceiver();
-		if(node->data->needRedraw) needRedraw = true;
+		if(node->data->needRedisplay) needRedisplay = true;
 	}
 }
 int wsWindow::keyboardReceiver(int key, int scancode, int action, int mods) {
@@ -148,8 +148,8 @@ void wsWindow::windowResizeReceiver(wsCoord2 newSize) {
 		}
 	}
 	if(fatherWindow == nullptr) {
-		glfwSetWindowPos(((wsBaseWindow*)this)->glfwwindow, position.x, position.y);
-		glfwSetWindowSize(((wsBaseWindow*)this)->glfwwindow, size.x, size.y);
+		glfwSetWindowPos(((wsBaseWindow*)this)->glfwWindow, position.x, position.y);
+		glfwSetWindowSize(((wsBaseWindow*)this)->glfwWindow, size.x, size.y);
 	}
 	if (windowResizeCallback) {
 		makeContextCurrent();
@@ -160,7 +160,7 @@ void wsWindow::windowResizeReceiver(wsCoord2 newSize) {
 void wsWindow::windowMoveReceiver(wsCoord2 newPos) {
 	position = newPos;
 	if(fatherWindow == nullptr) {
-		glfwSetWindowPos(((wsBaseWindow*)this)->glfwwindow, position.x, position.y);
+		glfwSetWindowPos(((wsBaseWindow*)this)->glfwWindow, position.x, position.y);
 	}
 	if (windowMoveCallback) {
 		makeContextCurrent();

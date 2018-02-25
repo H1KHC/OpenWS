@@ -10,6 +10,8 @@ OpenWS is based on glfw, glew and the headers and libraries of your system.
 
 As it uses framebuffer to maintain windows, this library may doesn't support the old machines.
 
+And you may also need OpenMP library(gcc option `-fopenmp`) for the best performance.
+
 ## Compiling OpenWS
 
 OpenWS uses makefile to compile.

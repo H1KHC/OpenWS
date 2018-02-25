@@ -2,6 +2,8 @@
 #include <GL/gl.h>
 #include <openWS.h>
 
+int rootWindow;
+
 struct windowData {
 	float theta, theta1, theta2;
 	int count, lastx, lasty;
@@ -94,7 +96,7 @@ void enterC(int windowID, int) {
 
 int createWindow(int, int button, int state, int) {
 	if (button == WS_MOUSE_BUTTON_LEFT && state == WS_PRESS) {
-		int id = wsCreateWindow("noName", 128, 128, 256, 256, new windowData, WS_STYLE_ALIGN_LD | WS_STYLE_2D_WINDOW, WS_ROOT_WINDOW_ID);
+		int id = wsCreateWindow("noName", 128, 128, 256, 256, new windowData, WS_STYLE_ALIGN_LD | WS_STYLE_2D_WINDOW, rootWindow);
 		wsSetWindowDisplayCallback(id, display);
 		wsSetWindowCursorMoveCallback(id, cursor);
 		wsSetWindowMouseButtonCallback(id, mouse);
@@ -111,23 +113,20 @@ void recycle(int windowID) {
 
 int main() {
 	int id, nid;
-	if (!wsInit("wsDemo", 200, 200, 512, 512)) {
+	if (!wsInit()) {
 		unsigned err = wsLastError();
 		printf("Init failed, error code: %d %s", err, wsErrorString(err));
 		return -1;
 	}
-	wsSetWindowData(WS_ROOT_WINDOW_ID, new windowData);
-	wsSetWindowStyle(WS_ROOT_WINDOW_ID, WS_STYLE_ALIGN_LD, WS_SWST_ADD);
-#ifdef _DEBUG
+	rootWindow = wsCreateWindow("wsDemo", 200, 200, 512, 512, new windowData, WS_STYLE_DEFAULT | WS_STYLE_ALIGN_LD);
 	wsSetDebugMode(WS_SDM_FULL);
-#endif
-	wsSetWindowCloseCallback(WS_ROOT_WINDOW_ID, recycle);
-	wsSetWindowMouseButtonCallback(WS_ROOT_WINDOW_ID, createWindow);
-	wsSetWindowCursorMoveCallback(WS_ROOT_WINDOW_ID, remPos);
+	wsSetWindowCloseCallback(rootWindow, recycle);
+	wsSetWindowMouseButtonCallback(rootWindow, createWindow);
+	wsSetWindowCursorMoveCallback(rootWindow, remPos);
 
 	id = wsCreateWindow("Window1", 128, 128, 256, 256, new windowData,
 		WS_STYLE_NO_BUFFER_RESIZE | WS_STYLE_ALIGN_LD | WS_STYLE_2D_WINDOW,
-		WS_ROOT_WINDOW_ID);
+		rootWindow);
 	wsSetWindowDisplayCallback(id, display);
 	wsSetWindowCursorMoveCallback(id, cursor);
 	wsSetWindowMouseButtonCallback(id, mouse);

@@ -1,19 +1,23 @@
 #include "wsWindow.h"
 #include "wsClock.h"
-extern int inited;
 
 inline void wsFlush(wsBaseWindow* baseWindow) {
-	if (baseWindow->displayCallback == nullptr) {
-		glBindFramebuffer(GL_FRAMEBUFFER, baseWindow->getFramebuffer());
-		glViewport(0, 0, baseWindow->size.x, baseWindow->size.y);
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	extern thread_local wsBaseWindow* currentBaseWindow;
+	if(currentBaseWindow != baseWindow) {
+		int wsInitGLEW();
+		glfwMakeContextCurrent(baseWindow->glfwWindow);
+		currentBaseWindow = baseWindow;
+		wsInitGLEW();
 	}
-	baseWindow->displayReceiver();
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, baseWindow->size.x, baseWindow->size.y);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	baseWindow->displayReceiver();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, baseWindow->size.x, baseWindow->size.y);
 	glPushMatrix();
 	glLoadIdentity();
 	glOrtho(0, baseWindow->size.x, 0, baseWindow->size.y, -1, 1);
@@ -26,7 +30,7 @@ inline void wsFlush(wsBaseWindow* baseWindow) {
 	baseWindow->display(0, 0, 0, 0, baseWindow->size.x, baseWindow->size.y);
 	glPopAttrib();
 	glPopMatrix();
-	glfwSwapBuffers(baseWindow->glfwwindow);
+	glfwSwapBuffers(baseWindow->glfwWindow);
 }
 
 static bool inMainLoop = false, terminated = false;
@@ -41,34 +45,38 @@ int wsTerminate() {
 }
 
 void wsMain() {
-	extern thread_local wsWindow* currentBaseWindow;
 	extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	while (baseWindows.size()) {
+	while (baseWindows.size() && !terminated) {
 		for(auto windowPair = baseWindows.begin(), _end = baseWindows.end();
 			windowPair != _end; ) {
 			wsBaseWindow* baseWindow = windowPair->second;
-			if (!baseWindow || glfwWindowShouldClose(windowPair->first) || terminated) {
+			
+			if (!baseWindow || glfwWindowShouldClose(windowPair->first)) {
+				glfwDestroyWindow(windowPair->first);
 				windowPair = baseWindows.erase(windowPair);
-				continue;
+			} else {
+				wsFlush(baseWindow);
+				++windowPair;
 			}
-			if(currentBaseWindow != baseWindow) {
-				int wsInitGLEW();
-				glfwMakeContextCurrent(windowPair->first);
-				currentBaseWindow = baseWindow;
-				wsInitGLEW();
-			}
-
-			wsFlush(baseWindow);
-			++windowPair;
+			glfwPollEvents();
 		}
-		glfwPollEvents();
+	}
+	if(terminated) {
+		for(auto windowPair = baseWindows.begin(), _end = baseWindows.end();
+		  windowPair != _end; windowPair = baseWindows.erase(windowPair)) {
+			glfwMakeContextCurrent(windowPair->first);
+			if(windowPair->second) windowPair->second->deleteWindow();
+			glfwSetWindowShouldClose(windowPair->first, GLFW_TRUE);
+			glfwPollEvents();
+		}
 	}
 	return;
 }
 
 void wsMainLoop() {
+	extern int inited;
 	if (!inited) {
 		wsSetError(WS_ERR_NOT_INITIALIZED);
 		return;

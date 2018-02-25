@@ -2,6 +2,8 @@
 #include <GL/gl.h>
 #include <openWS.h>
 
+int rootWindow;
+
 struct windowData {
 	float theta, theta1, theta2;
 	int leftButton, rightButton, firstPress;
@@ -42,7 +44,7 @@ int mouseButton(int windowID, int button, int action, int mods) {
 	 	else if(button == WS_MOUSE_BUTTON_RIGHT) data->rightButton = data->firstPress = action;
 	//	else if(button == WS_MOUSE_BUTTON_MIDDLE) wsCloseWindow(windowID);
 	} else if(button == WS_MOUSE_BUTTON_LEFT && action) {
-	//	int id = wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 128, 128, 256, 256, WS_ROOT_WINDOW_ID);
+	//	int id = wsCreateWindow(WS_STYLE_DEFAULT, "", &wndCbk, 128, 128, 256, 256, rootWindow);
 	//	wsSetWindowData(id, new windowData);
 	}
 	printf("Mouse.button: Window %d, button %d, action %d, mods %d\n", windowID, button, action, mods);
@@ -118,26 +120,27 @@ void windowFocus(int windowID, int focused) {
 }
 
 int main() {
-	if (!wsInit("messages", 200, 200, 512, 512)){
+	if (!wsInit()){
 		unsigned err = wsLastError();
 		printf("Init failed, error code: %d %s", err, wsErrorString(err));
 		return -1;
 	}
-	wsSetWindowDisplayCallback(WS_ROOT_WINDOW_ID, display);
-	wsSetWindowMouseButtonCallback(WS_ROOT_WINDOW_ID, mouseButton);
-	wsSetWindowCursorMoveCallback(WS_ROOT_WINDOW_ID, cursorMove);
-	wsSetWindowCursorEnterCallback(WS_ROOT_WINDOW_ID, cursorEnter);
-	wsSetWindowScrollCallback(WS_ROOT_WINDOW_ID, scroll);
-	wsSetWindowKeyboardCallback(WS_ROOT_WINDOW_ID, key);
-	wsSetWindowCharCallback(WS_ROOT_WINDOW_ID, charC);
-	wsSetWindowFileDropCallback(WS_ROOT_WINDOW_ID, fileDrop);
-	wsSetWindowMoveCallback(WS_ROOT_WINDOW_ID, windowMove);
-	wsSetWindowResizeCallback(WS_ROOT_WINDOW_ID, windowResize);
-	wsSetWindowCloseCallback(WS_ROOT_WINDOW_ID, windowClose);
-	wsSetWindowFocusCallback(WS_ROOT_WINDOW_ID, windowFocus);
+	rootWindow = wsCreateWindow("messages", 200, 200, 512, 512, new windowData);
+	wsSetWindowDisplayCallback(rootWindow, display);
+	wsSetWindowMouseButtonCallback(rootWindow, mouseButton);
+	wsSetWindowCursorMoveCallback(rootWindow, cursorMove);
+	wsSetWindowCursorEnterCallback(rootWindow, cursorEnter);
+	wsSetWindowScrollCallback(rootWindow, scroll);
+	wsSetWindowKeyboardCallback(rootWindow, key);
+	wsSetWindowCharCallback(rootWindow, charC);
+	wsSetWindowFileDropCallback(rootWindow, fileDrop);
+	wsSetWindowMoveCallback(rootWindow, windowMove);
+	wsSetWindowResizeCallback(rootWindow, windowResize);
+	wsSetWindowCloseCallback(rootWindow, windowClose);
+	wsSetWindowFocusCallback(rootWindow, windowFocus);
 	wsSetDebugMode(WS_SDM_FULL);
-	wsSetWindowData(WS_ROOT_WINDOW_ID, new windowData);
-	int id = wsCreateWindow("", 128, 128, 256, 256, new windowData);
+	wsSetWindowData(rootWindow, new windowData);
+	int id = wsCreateWindow("", 128, 128, 256, 256, new windowData, WS_STYLE_DEFAULT, rootWindow);
 	wsSetWindowDisplayCallback(id, display);
 	wsSetWindowMouseButtonCallback(id, mouseButton);
 	wsSetWindowCursorMoveCallback(id, cursorMove);

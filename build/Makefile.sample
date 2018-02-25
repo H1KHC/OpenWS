@@ -1,5 +1,3 @@
-EXECUTABLES = $(patsubst $(SRC_DIR)/Sample/%.cpp, $(BIN_DIR)/%, $(wildcard $(SRC_DIR)/Sample/*.cpp))
-
 ifeq "$(PLATFORM)" "linux"
 	ifdef STATIC
 		SPLDFLAGS += -lopenWSs
@@ -8,11 +6,15 @@ ifeq "$(PLATFORM)" "linux"
 	endif
 else
 	ifdef STATIC
+		EXECUTABLE_SUFFIX = .exe
 		SPLDFLAGS += -lopenWS
 	else
 		SPLDFLAGS += -lopenWS.dll
 	endif
 endif
+
+EXECUTABLES = $(patsubst $(SRC_DIR)/Sample/%.cpp, $(BIN_DIR)/%$(EXECUTABLE_SUFFIX), $(wildcard $(SRC_DIR)/Sample/*.cpp))
+
 ifeq ($(OS),Windows_NT)
 	SPLDFLAGS += -lglu32
 else
@@ -34,5 +36,5 @@ endif
 
 sample: pre $(LIB_FULLNAME) $(EXECUTABLES)
 
-$(BIN_DIR)/%: $(SRC_DIR)/Sample/%.cpp
+$(BIN_DIR)/%$(EXECUTABLE_SUFFIX): $(SRC_DIR)/Sample/%.cpp $(LIB_FULLNAME)
 	g++ -o $@ $< $(SPCXXFLAGS) $(SPLDFLAGS)

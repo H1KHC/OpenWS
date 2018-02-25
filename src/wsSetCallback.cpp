@@ -1,25 +1,6 @@
 #include "wsWindowManager.h"
 #include <GLFW/glfw3.h>
-
-extern thread_local wsWindow *currentWindow;
-extern int inited;
-#define checkInit(failReturnValue) do {\
-		if (!inited) {\
-			wsSetError(WS_ERR_NOT_INITIALIZED);\
-			return (failReturnValue);\
-		}\
-	}while(0)
-
-#define checkInitAndFindWindow(window, id, failReturnValue) do{\
-		checkInit(failReturnValue);\
-		if(currentWindow && currentWindow->windowID == (id))\
-				(window) = currentWindow;\
-		else (window) = windowManager.findWindow(id);\
-		if (!(window)) {\
-			wsSetError(WS_ERR_WINDOW_NOT_FOUND);\
-			return (failReturnValue);\
-		}\
-	}while(0)
+#include "checkInitAndFindWindow.h"
 
 int wsSetJoystickConnectionCallback(void(*func)(int joystickID, int joystickState)) {
 	checkInit(false);
@@ -36,12 +17,12 @@ void windowIconifyReceiver(GLFWwindow *window, int iconified) {
 int wsSetWindowIconifyCallback(int windowID, wsWindowIconifyCallback callback) {
 	wsWindow* baseWindow;
 	checkInitAndFindWindow(baseWindow, windowID, false);
-	if(baseWindow->getFather() != nullptr) {
+	if(baseWindow->getFatherWindow() != nullptr) {
 		wsSetError(WS_ERR_UNIMPLEMENTED);
 		return false;
 	}
 	baseWindow->windowIconifyCallback = callback;
-	glfwSetWindowIconifyCallback(((wsBaseWindow*)baseWindow)->glfwwindow, nullptr);
+	glfwSetWindowIconifyCallback(((wsBaseWindow*)baseWindow)->glfwWindow, nullptr);
 	return true;
 }
 

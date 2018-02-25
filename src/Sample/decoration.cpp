@@ -99,7 +99,7 @@ int key(int windowID, int key, int, int action, int) {
 int main() {
 	srand(time(0));
 	wsInit();
-	glfwWindowHint(GLFW_DEPTH_BITS, 16);
+	wsSetWindowHint(GLFW_DEPTH_BITS, 16);
 	wsSetWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
 	wsSetWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	wsSetWindowHint(GLFW_RESIZABLE, GLFW_FALSE);

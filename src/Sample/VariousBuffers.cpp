@@ -4,6 +4,8 @@
 #include <openWS.h>
 #include <GLFW/glfw3.h>
 
+int rootWindow;
+
 struct windowData {
 	int theta, theta1, theta2;
 	windowData() : theta(0), theta1(0), theta2(0) {}
@@ -63,19 +65,20 @@ void display(int windowID, int) {
 }
 
 int main() {
-	if(!wsInit("Example", 200, 200, 512, 512)) {
+	if(!wsInit()) {
 		unsigned err = wsLastError();
 		printf("Init failed, error code: %d %s", err, wsErrorString(err));
 		return -1;
 	}
+	rootWindow = wsCreateWindow("Example", 200, 200, 512, 512, nullptr);
 	wsSetDebugMode(WS_SDM_CURSORPOS);
-	int id = wsCreateWindow("", 0, 0, 256, 256, new windowData, WS_STYLE_DEFAULT | WS_STYLE_STATIC_WINDOW);
+	int id = wsCreateWindow("", 0, 0, 256, 256, new windowData, WS_STYLE_DEFAULT | WS_STYLE_STATIC_WINDOW, rootWindow);
 	wsSetWindowDisplayCallback(id, display);
-	id = wsCreateWindow("", 0, 256, 256, 256, new windowData);
+	id = wsCreateWindow("", 0, 256, 256, 256, new windowData, WS_STYLE_DEFAULT, rootWindow);
 	wsSetWindowDisplayCallback(id, display);
-	id = wsCreateWindow("", 256, 0, 256, 256, new windowData, WS_STYLE_ALIGN_LU | WS_STYLE_STATIC_WINDOW);
+	id = wsCreateWindow("", 256, 0, 256, 256, new windowData, WS_STYLE_ALIGN_LU | WS_STYLE_STATIC_WINDOW, rootWindow);
 	wsSetWindowDisplayCallback(id, display);
-	id = wsCreateWindow("", 256, 256, 256, 256, new windowData, WS_STYLE_ALIGN_LU, WS_ROOT_WINDOW_ID);
+	id = wsCreateWindow("", 256, 256, 256, 256, new windowData, WS_STYLE_ALIGN_LU, rootWindow);
 	wsSetWindowDisplayCallback(id, display);
 	wsMainLoop();
 	return 0;

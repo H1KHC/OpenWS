@@ -1,7 +1,6 @@
 #include "wsWindow.h"
 #include "wsList.h"
 #include <openWS.h>
-extern int inited;
 
 inline int wsInitGLFW() {
 	return glfwInit();
@@ -33,6 +32,7 @@ int wsInitGLEW() {
 	return true;
 }
 int wsInit() {
+	extern int inited;
 	if (!wsInitGLFW())
 		return false;
 //	if (!wsInitGLEW())
@@ -43,6 +43,7 @@ int wsInit() {
 
 int wsDeinit() {
 	extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
+	extern int inited;
 	if (!inited) {
 		wsSetError(WS_ERR_NOT_INITIALIZED);
 		return false;

@@ -9,6 +9,9 @@
 #include <math.h>
 #include <list>
 
+//------------------------------------ Global variables ------------------------------------//
+int rootWindow;
+
 //--------------------------------------- Animation ----------------------------------------//
 #define ANIME_ORIGIN(i,j)	(i<<2|j)
 #define ANIME_EAT(i,j)		(i<<6|j<<4)
@@ -327,7 +330,7 @@ void check() {
 	for(int i = 0; i < 4; ++i)
 		for(int j = 0; j < 3; ++j)
 			if(Map[i][j] == Map[i][j + 1] || Map[j][i] == Map[j + 1][i]) return;
-	int id = wsCreateWindow("fail", 30, 80, 440, 440, nullptr);
+	int id = wsCreateWindow("fail", 30, 80, 440, 440, nullptr, WS_STYLE_DEFAULT, rootWindow);
 	wsSetWindowDisplayCallback(id, halfopacityCovery);
 	wsSetWindowKeyboardCallback(id, failKey);
 }
@@ -438,21 +441,22 @@ void mapReset() {
 }
 
 int main() {
-    wsInit("2048", 128, 128, 500, 550);
+    wsInit();
 	srand(time(0));
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_BLEND);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	mapReset();
-	int id = wsCreateWindow("Map", 30, 80, 440, 440, nullptr);
+	rootWindow = wsCreateWindow("2048", 128, 128, 500, 550, nullptr);
+	int id = wsCreateWindow("Map", 30, 80, 440, 440, nullptr, WS_STYLE_DEFAULT, rootWindow);
 	wsSetWindowDisplayCallback(id, displayMap);
-	id = wsCreateWindow("Info", 30, 30, 440, 30, nullptr);
+	id = wsCreateWindow("Info", 30, 30, 440, 30, nullptr, WS_STYLE_DEFAULT, rootWindow);
 	wsSetWindowDisplayCallback(id, displayInfo);
-	wsSetWindowDisplayCallback(WS_ROOT_WINDOW_ID, flushUnderColor);
-	wsSetWindowKeyboardCallback(WS_ROOT_WINDOW_ID, keyCallback);
+	wsSetWindowDisplayCallback(rootWindow, flushUnderColor);
+	wsSetWindowKeyboardCallback(rootWindow, keyCallback);
 	#ifdef linux
-    wsSetFPS(60);
+	wsSetFPS(60);
 	#endif
-    wsMainLoop();
+	wsMainLoop();
 }

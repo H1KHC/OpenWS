@@ -3,67 +3,81 @@
 extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
 
 void wsKeyboardReceiver(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	baseWindows[window]->keyboardReceiver(key, scancode, action, mods);
+	auto windowPair = baseWindows.find(window);
+	if(windowPair->second)
+		windowPair->second->keyboardReceiver(key, scancode, action, mods);
 }
 
 void wsCharReceiver(GLFWwindow* window, unsigned key, int mods) {
-	baseWindows[window]->charReceiver(key, mods);
+	auto windowPair = baseWindows.find(window);
+	if(windowPair->second)
+		windowPair->second->charReceiver(key, mods);
 }
 
 void wsMouseReceiver(GLFWwindow* window, int button, int action, int mods) {
-	baseWindows[window]->mouseReceiver(button, action, mods);
+	auto windowPair = baseWindows.find(window);
+	if(windowPair->second)
+		windowPair->second->mouseReceiver(button, action, mods);
 }
 
 void wsCursorMoveReceiver(GLFWwindow* window, double xpos, double ypos) {
-	baseWindows[window]->cursorMoveReceiver(xpos, ypos);
+	auto windowPair = baseWindows.find(window);
+	if(windowPair->second)
+		windowPair->second->cursorMoveReceiver(xpos, ypos);
 }
 
 void wsCursorEnterReceiver(GLFWwindow* window, int entered) {
-	baseWindows[window]->cursorEnterReceiver(int(entered == GLFW_TRUE));
+	auto windowPair = baseWindows.find(window);
+	if(windowPair->second)
+		windowPair->second->cursorEnterReceiver(int(entered == GLFW_TRUE));
 }
 
 void wsScrollReceiver(GLFWwindow* window, double xoffset, double yoffset) {
-	baseWindows[window]->scrollReceiver(xoffset, yoffset);
+	auto windowPair = baseWindows.find(window);
+	if(windowPair->second)
+		windowPair->second->scrollReceiver(xoffset, yoffset);
 }
 
 void wsWindowResizeReceiver(GLFWwindow* window, int w, int h) {
-	baseWindows[window]->windowResizeReceiver(wsCoord2{ w, h });
+	auto windowPair = baseWindows.find(window);
+	if(windowPair->second)
+		windowPair->second->windowResizeReceiver(wsCoord2{ w, h });
 }
 
 void wsWindowMoveReceiver(GLFWwindow* window, int x, int y) {
-	baseWindows[window]->windowMoveReceiver(wsCoord2{ x, y });
+	auto windowPair = baseWindows.find(window);
+	if(windowPair->second)
+		windowPair->second->windowMoveReceiver(wsCoord2{ x, y });
 }
 
 void wsWindowCloseReceiver(GLFWwindow* window) {
-	baseWindows[window]->windowCloseReceiver();
-	//	baseWindows[window]->deleteWindow();
-	wsDeinit();
+	auto windowPair = baseWindows.find(window);
+	windowPair->second->windowCloseReceiver();
+	windowPair->second = nullptr;
 }
 
 void wsWindowFocusReceiver(GLFWwindow* window, int focused) {
-	extern thread_local wsWindow* currentBaseWindow;
-	wsWindow *newWindow = baseWindows[window];
+	extern thread_local wsBaseWindow* currentBaseWindow;
+	wsBaseWindow *newWindow = baseWindows[window];
+	if(!newWindow) return;
 	if(focused && currentBaseWindow != newWindow) {
 		//mutex
-		currentBaseWindow = baseWindows[window];
+		currentBaseWindow = newWindow;
 		currentBaseWindow->windowFocusReceiver(int(focused == GLFW_TRUE));
 	} else {
-		baseWindows[window]->windowFocusReceiver(int(focused == GLFW_TRUE));
+		newWindow->windowFocusReceiver(int(focused == GLFW_TRUE));
 	}
 }
 
 void wsFileDropReceiver(GLFWwindow* window, int count, const char **filename) {
-	baseWindows[window]->fileDropReceiver(count, filename);
+	auto windowPair = baseWindows.find(window);
+	if(windowPair->second)
+		windowPair->second->fileDropReceiver(count, filename);
 }
 
 struct windowHintData { int hint, value; };
 static wsList<windowHintData> windowHintLists;
 int wsSetWindowHint(int hint, int value) {
-	extern int inited;
-	if(inited) {
-		wsSetError(WS_ERR_ILLEGAL_OPERATION);
-		return false;
-	}
 	windowHintLists.addBack(windowHintData{hint, value});
 	return true;
 }
@@ -72,26 +86,26 @@ int createGLFWwindow(wsBaseWindow* window) {
 	for(auto* data = windowHintLists.front(); data; data = data->next)
 		glfwWindowHint(data->data.hint, data->data.value);
 
-	window->glfwwindow = glfwCreateWindow(window->size.x, window->size.y, window->name, nullptr, nullptr);
+	window->glfwWindow = glfwCreateWindow(window->size.x, window->size.y, window->name, nullptr, nullptr);
 
-	if(window->glfwwindow == nullptr) return false;
+	if(window->glfwWindow == nullptr) return false;
 	//if(contextInUse)	//unimplemented
-	glfwMakeContextCurrent(window->glfwwindow);
-	glfwSetKeyCallback(window->glfwwindow, wsKeyboardReceiver);
-	glfwSetCharModsCallback(window->glfwwindow, wsCharReceiver);
-	glfwSetMouseButtonCallback(window->glfwwindow, wsMouseReceiver);
-	glfwSetCursorPosCallback(window->glfwwindow, wsCursorMoveReceiver);
-	glfwSetCursorEnterCallback(window->glfwwindow, wsCursorEnterReceiver);
-	glfwSetScrollCallback(window->glfwwindow, wsScrollReceiver);
-	glfwSetWindowSizeCallback(window->glfwwindow, wsWindowResizeReceiver);
-	glfwSetWindowPosCallback(window->glfwwindow, wsWindowMoveReceiver);
-	glfwSetWindowCloseCallback(window->glfwwindow, wsWindowCloseReceiver);
-	glfwSetWindowFocusCallback(window->glfwwindow, wsWindowFocusReceiver);
-	glfwSetDropCallback(window->glfwwindow, wsFileDropReceiver);
+	glfwMakeContextCurrent(window->glfwWindow);
+	glfwSetKeyCallback(window->glfwWindow, wsKeyboardReceiver);
+	glfwSetCharModsCallback(window->glfwWindow, wsCharReceiver);
+	glfwSetMouseButtonCallback(window->glfwWindow, wsMouseReceiver);
+	glfwSetCursorPosCallback(window->glfwWindow, wsCursorMoveReceiver);
+	glfwSetCursorEnterCallback(window->glfwWindow, wsCursorEnterReceiver);
+	glfwSetScrollCallback(window->glfwWindow, wsScrollReceiver);
+	glfwSetWindowSizeCallback(window->glfwWindow, wsWindowResizeReceiver);
+	glfwSetWindowPosCallback(window->glfwWindow, wsWindowMoveReceiver);
+	glfwSetWindowCloseCallback(window->glfwWindow, wsWindowCloseReceiver);
+	glfwSetWindowFocusCallback(window->glfwWindow, wsWindowFocusReceiver);
+	glfwSetDropCallback(window->glfwWindow, wsFileDropReceiver);
 	glfwSwapInterval(1);
 
-	baseWindows.insert(std::make_pair(window->glfwwindow, window));
-	glfwSetWindowPos(window->glfwwindow, window->position.x > 0 ? window->position.x : 1,
+	baseWindows.insert(std::make_pair(window->glfwWindow, window));
+	glfwSetWindowPos(window->glfwWindow, window->position.x > 0 ? window->position.x : 1,
 							 window->position.y > 0 ? window->position.y : 1);
 
 	return true;

@@ -27,15 +27,19 @@
         [x] window focus
     [x] wsMain
         for(window: baseWindows)
+    [x] fix display coordinary issue
+    [x] example adjust
     [ ] fps control
         [x] fpsClock in each baseWindow
         [x] just to check whether to call display callback
         [ ] real control in window flush
             [ ] wsSetFPS
             [ ] needRedraw->displayCallback->needRedisplay->display
-    [ ] fix display coordinary issue
+                [ ] unique depth for each window
+                [ ] check if(needRedisplay) then display
     [-] check all currentBaseWindow changing function
         to prevent Context change in display (currently only single thread)
     [ ] wsTerminate(add param force: do not wait for other threads)
     [ ] wsGetTopWindow(int windowID)
-    [ ] example adjust
+    [ ] wsBaseWindow contextInUsing
+    [ ] pushdown tags in receivers

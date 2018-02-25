@@ -1,40 +1,26 @@
 #include "wsWindow.h"
 #include "wsWindowManager.h"
+#include "checkInitAndFindWindow.h"
 
-extern int inited;
-extern thread_local wsWindow *currentWindow;
-
-#define checkInit(failReturnValue) do {\
-		if (!inited) {\
-			wsSetError(WS_ERR_NOT_INITIALIZED);\
-			return (failReturnValue);\
-		}\
-	}while(0)
-#define findWindow(window, id, failReturnValue) do{\
-		if(currentWindow && currentWindow->windowID == (id))\
-			(window) = currentWindow;\
-		else (window) = windowManager.findWindow(id);\
-		if (!(window)) {\
-			wsSetError(WS_ERR_WINDOW_NOT_FOUND);\
-			return (failReturnValue);\
-		}\
-	}while(0)
-#define checkInitAndFindWindow(window, id, failReturnValue) do{\
-		checkInit(failReturnValue);\
-		findWindow(window, id, failReturnValue);\
-	}while(0)
-
-int wsCreateWindow(const char *windowName, int x, int y, int width, int height, void *windowData, int windowStyle, int fatherWindowID) {
+int wsCreateWindow(const char *windowName, int x, int y, int width, int height,
+				   void *windowData, int windowStyle, int fatherWindowID) {
 	extern thread_local wsBaseWindow* currentBaseWindow;
+	extern thread_local wsWindow* currentWindow;
 
 	checkInit(WS_INVALID_WINDOW_ID);
 
 	if(fatherWindowID == WS_ROOT_WINDOW_ID) {
 		int createGLFWwindow(wsBaseWindow*);
-		wsBaseWindow *newWindow = new wsBaseWindow(windowName, wsCoord2{ x, y }, wsCoord2{ width, height }, windowStyle);
+
+		wsBaseWindow *newWindow =
+			new wsBaseWindow(windowName,
+							 wsCoord2{ x, y },
+							 wsCoord2{ width, height },
+							 windowStyle);
+
 		if(!createGLFWwindow(newWindow)) {
-			if(newWindow->glfwwindow)
-				glfwSetWindowShouldClose(newWindow->glfwwindow, 1);
+			if(newWindow->glfwWindow)
+				glfwSetWindowShouldClose(newWindow->glfwWindow, 1);
 			delete newWindow;
 			wsSetError(WS_ERR_FRAMEBUFFER_GENERATE_FAILED);
 			return WS_INVALID_WINDOW_ID;
@@ -43,8 +29,8 @@ int wsCreateWindow(const char *windowName, int x, int y, int width, int height, 
 		wsInitGLEW();
 		if(!newWindow->genFramebuffer()) {
 			extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
-			glfwSetWindowShouldClose(newWindow->glfwwindow, 1);
-			baseWindows[newWindow->glfwwindow] = nullptr;
+			glfwSetWindowShouldClose(newWindow->glfwWindow, 1);
+			baseWindows[newWindow->glfwWindow] = nullptr;
 			delete newWindow;
 			newWindow = nullptr;
 			wsSetError(WS_ERR_FRAMEBUFFER_GENERATE_FAILED);
@@ -53,16 +39,22 @@ int wsCreateWindow(const char *windowName, int x, int y, int width, int height, 
 		currentBaseWindow = newWindow;
 		currentWindow = newWindow;
 		newWindow->topWindow = newWindow;
+		newWindow->userData = windowData;
 		return newWindow->windowID;
 	} else {
 		wsWindow *toBeAttached, *newWindow;
 		findWindow(toBeAttached, fatherWindowID, WS_INVALID_WINDOW_ID);
-		newWindow = new wsWindow(windowName, wsCoord2{ x, y }, wsCoord2{ width, height }, windowStyle);
+
+		newWindow = new wsWindow(windowName,
+								 wsCoord2{ x, y },
+								 wsCoord2{ width, height },
+								 windowStyle);
+
 		newWindow->fatherWindow = toBeAttached;
 		newWindow->userData = windowData;
 		if(currentBaseWindow != toBeAttached->topWindow) {
 			int wsInitGLEW();
-			glfwMakeContextCurrent(toBeAttached->topWindow->glfwwindow);
+			glfwMakeContextCurrent(toBeAttached->topWindow->glfwWindow);
 			currentBaseWindow = toBeAttached->topWindow;
 			wsInitGLEW();
 		}
@@ -80,6 +72,7 @@ int wsCreateWindow(const char *windowName, int x, int y, int width, int height, 
 		return newWindow->windowID;
 	}
 }
+
 int wsCloseWindow(int windowID) {
 	wsWindow *window;
 	if(windowID == WS_ROOT_WINDOW_ID) {
@@ -90,6 +83,7 @@ int wsCloseWindow(int windowID) {
 	window->windowCloseReceiver();
 	return true;
 }
+
 int wsAttachWindow(int subwindowID, int fatherWindowID) {
 	wsWindow *subWindow, *fatherWindow;
 	checkInit(false);
@@ -112,6 +106,7 @@ int wsAttachWindow(int subwindowID, int fatherWindowID) {
 	fatherWindow->subWindow.addBack(subWindow);
 	subWindow->fatherWindow = fatherWindow;
 	subWindow->topWindow = fatherWindow->topWindow;
+	subWindow->topWindowChangeTag = true;
 	return true;
 }
 int wsFocusWindow(int windowID) {
@@ -127,7 +122,3 @@ int wsFocusWindow(int windowID) {
 	}
 	return true;
 }
-
-#undef checkInitAndFindWindow
-#undef findWindow
-#undef checkInit

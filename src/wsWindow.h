@@ -15,8 +15,11 @@ typedef wsListNode<wsWindow *> wsWindowListNode;
 struct wsBaseWindow;
 
 typedef class wsWindow : public wsWindowInfo {
+
+//------------------------------- FPS Control -------------------------------//
+protected:
 	wsClock *fpsClock;
-	int fpsControl, FPS, needRedisplay, needRedraw;
+	int fpsControl, FPS, needRedraw, needRedisplay;
 	bool needFlush() {
 		if (fpsControl) {
 			if (FPS) {
@@ -27,35 +30,105 @@ typedef class wsWindow : public wsWindowInfo {
 					return true;
 				}
 			} else {
-				if (!needRedisplay)
+				if (!needRedraw)
 					return false;
 				else {
-					needRedisplay = false;
+					needRedraw = false;
 					return true;
 				}
 			}
 		} else return true;
 	}
+public:
+
+	void setFPS(int fps) {
+		fpsControl = true;
+		FPS = fps;
+		if (fpsClock == nullptr)
+			fpsClock = new wsClock;
+	}
+
+	bool postRedisplay() {
+		if(!fpsControl || FPS != 0) return false;
+		needRedraw = true;
+		return true;
+	}
+
+//------------------------------- Framebuffer -------------------------------//
 protected:
 	unsigned framebuffer, depthbuffer;
+	bool genFramebuffer() {
+		int generateFramebuffer(GLuint &frameBuffer,
+								GLuint &depthBuffer,
+								GLuint &texture,
+								const int width,
+								const int height);
+
+		int generateFramebuffer(GLuint &frameBuffer,
+								GLuint &texture,
+								const int width,
+								const int height);
+
+		bufferSize = size;
+		if(styleMask & WS_STYLE_NO_DEPTHBUFFER) {
+			generateFramebuffer(framebuffer, texture, size.x, size.y);
+			depthbuffer = 0;
+		} else {
+			generateFramebuffer(framebuffer, depthbuffer, texture,
+								size.x, size.y);
+		}
+		return true;
+	}
+	friend int wsCreateWindow(const char *windowName,
+							  int x, int y, int width, int height,
+							  void *windowData, int windowStyle,
+							  int fatherWindowID);
+
+	friend int wsSetWindowDisplayCallback(int windowID,
+										  wsDisplayCallback callback);
+
+public:
+	unsigned getFramebuffer() {
+		return (styleMask & WS_STYLE_NO_FRAMEBUFFER) ? 0 : framebuffer;
+	}
+
+	unsigned getDepthbuffer() {
+		return (styleMask & WS_STYLE_NO_DEPTHBUFFER) ? 0 : depthbuffer;
+	}
+
+//----------------------------- Father and Root -----------------------------//
+protected:
 	wsWindow *fatherWindow;
 	wsBaseWindow *topWindow;
-	wsList<wsWindow *> subWindow;
-	wsWindowListNode *windowUnderCursor, *thisWindowNode;
+	bool topWindowChangeTag;	//mutex need
+	wsWindowListNode *thisWindowNode;
 
-	friend class wsWindowManager;
-	
-	friend int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback);
-	friend int wsSetWindowIconifyCallback(int windowID, wsWindowIconifyCallback callback);
-	friend int wsCreateWindow(const char *windowName, int x, int y, int width, int height, void *windowData, int windowStyle, int fatherWindowID);
+	void pushDownTopWindowChangeTag() {
+		if(topWindowChangeTag) {
+			for (auto *node = subWindow.front(); node; node = node->next) {
+				if(node->data->topWindow != topWindow) {
+					node->data->topWindow = topWindow;
+					node->data->topWindowChangeTag = true;
+				}
+			}
+			topWindowChangeTag = false;
+		}
+	}
+
 	friend int wsAttachWindow(int subwindowID, int fatherWindowID);
 	friend int wsFocusWindow(int windowID);
-	friend void wsFlush(wsWindow* baseWindow);
 	friend GLFWwindow* wsGetGLFWWindow(int windowID);
-	friend void wsMakeContextCurrent(wsWindow* window);
+public:
+	const wsWindow* getFatherWindow() const { return fatherWindow; }
+	const wsBaseWindow* getTopWindow() const { return topWindow; }
+	const wsWindowListNode* getThisNode() const { return thisWindowNode; }
 
+//------------------------------- Sub Windows -------------------------------//
+	wsList<wsWindow *> subWindow;
+	wsWindowListNode *windowUnderCursor;
 	// Must ensure that the window is his subwindow
 	void focusWindow(wsWindowListNode *window) {
+		// if(window->data->fatherWindow != this) ERR;
 		if (window == subWindow.front()) return;
 		if (subWindow.front()->data->focused)
 			subWindow.front()->data->windowFocusReceiver(false);
@@ -64,43 +137,16 @@ protected:
 			window->data->windowFocusReceiver(true);
 		}
 	}
-public:
-	unsigned getFramebuffer() { return (styleMask & WS_STYLE_NO_FRAMEBUFFER) ? framebuffer : 0; }
-	unsigned getDepthbuffer() { return (styleMask & WS_STYLE_NO_DEPTHBUFFER) ? depthbuffer : 0; }
-	wsList<wsWindow *>* getSubWindowList() { return &subWindow; };
-	wsWindow* getFather() { return fatherWindow; }
-	wsWindowListNode* getWindowUnderCursor() { return windowUnderCursor; }
-	wsWindowListNode* getThisNode() { return thisWindowNode; }
-
-	int pointIn(wsCoord2 point) {
-		return point.x >= position.x && point.y >= position.y && point.x <= position.x + size.x && point.y <= position.y + size.y;
-	}
-
-	wsWindow() = delete;
-	wsWindow(const char *title, const wsCoord2 position, const wsCoord2 size, const int style);
-	~wsWindow();
-
-	void display(int lastX, int lastY, int cutX, int cutY, int cutWidth, int cutHeight);
-
-	void displayReceiver();
-	int keyboardReceiver(int key, int scancode, int action, int mods);
-	int charReceiver(unsigned key, int mods);
-	int mouseReceiver(int button, int action, int mods);
-	int cursorMoveReceiver(double xpos, double ypos);
-	int scrollReceiver(double xoffset, double yoffset);
-	int fileDropReceiver(int count, const char **filename);
-
-	void cursorEnterReceiver(int entered);
-	void windowResizeReceiver(wsCoord2 newSize);
-	void windowMoveReceiver(wsCoord2 newPos);
-	void windowCloseReceiver();
-	void windowFocusReceiver(int focused);
-
 	void focusWindowUnderCursor() {
 		focusWindow(windowUnderCursor);
 	}
+
+	int pointIn(wsCoord2 point) {
+		return point.x >= position.x && point.x <= position.x + size.x
+			&& point.y >= position.y && point.y <= position.y + size.y;
+	}
 	int updateCursorWindow() {
-		for (wsWindowListNode *node = subWindow.front(); node; node = node->next) {
+		for (auto node = subWindow.front(); node; node = node->next) {
 			if (node->data->styleMask & WS_STYLE_NOFOCUS) continue;
 			if (node->data->pointIn(cursorPos)) {
 				if (windowUnderCursor != node) {
@@ -119,21 +165,44 @@ public:
 		}
 		return false;
 	}
-
-	bool genFramebuffer() {
-		int generateFramebuffer(GLuint &frameBuffer, GLuint &depthBuffer, GLuint &texture, const int width, const int height);
-		int generateFramebuffer(GLuint &frameBuffer, GLuint &texture, const int width, const int height);
-		bufferSize = size;
-		if(styleMask & WS_STYLE_NO_DEPTHBUFFER) {
-			generateFramebuffer(framebuffer, texture, size.x, size.y);
-			depthbuffer = 0;
-		} else {
-			generateFramebuffer(framebuffer, depthbuffer, texture, size.x, size.y);
-		}
-		return true;
+	wsList<wsWindow *>* getSubWindowList() { return &subWindow; };
+	wsWindowListNode* getWindowUnderCursor() { return windowUnderCursor; }
+public:
+	const wsList<wsWindow *>* getSubWindowList() const { return &subWindow; };
+	const wsWindowListNode* getWindowUnderCursor() const {
+		return windowUnderCursor;
 	}
 
+//---------------------------- Construct function ---------------------------//
+public:
+	wsWindow() = delete;
+	wsWindow(const char *title,
+			 const wsCoord2 position,
+			 const wsCoord2 size,
+			 const int style);
 	void deleteWindow();
+protected:
+	~wsWindow();
+
+//-------------------------------- Callbacks --------------------------------//
+public:
+	void display(int lastX, int lastY,
+				 int cutX, int cutY,
+				 int cutWidth, int cutHeight);
+
+	void displayReceiver();
+	int keyboardReceiver(int key, int scancode, int action, int mods);
+	int charReceiver(unsigned key, int mods);
+	int mouseReceiver(int button, int action, int mods);
+	int cursorMoveReceiver(double xpos, double ypos);
+	int scrollReceiver(double xoffset, double yoffset);
+	int fileDropReceiver(int count, const char **filename);
+
+	void cursorEnterReceiver(int entered);
+	void windowResizeReceiver(wsCoord2 newSize);
+	void windowMoveReceiver(wsCoord2 newPos);
+	void windowCloseReceiver();
+	void windowFocusReceiver(int focused);
 
 	inline void makeContextCurrent();
 	void freeContext() {
@@ -143,9 +212,14 @@ public:
 	}
 } wsWindow;
 
-typedef struct wsBaseWindow : public wsWindow {
-	GLFWwindow *glfwwindow;
-	wsBaseWindow(const char *title, const wsCoord2 position, const wsCoord2 size, int style)
+typedef class wsBaseWindow : public wsWindow {
+public:
+	GLFWwindow *glfwWindow;
+
+	wsBaseWindow(const char *title,
+				 const wsCoord2 position,
+				 const wsCoord2 size,
+				 int style)
 		:wsWindow(title, position, size, style) {};
 } wsBaseWindow;
 
@@ -154,7 +228,7 @@ inline void wsWindow::makeContextCurrent() {
 	extern thread_local wsBaseWindow *currentBaseWindow;
 	if(topWindow != currentBaseWindow) {
 		int wsInitGLEW();
-		glfwMakeContextCurrent(topWindow->glfwwindow);
+		glfwMakeContextCurrent(topWindow->glfwWindow);
 		currentBaseWindow = topWindow;
 		wsInitGLEW();
 	}

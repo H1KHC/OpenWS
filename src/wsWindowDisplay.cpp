@@ -4,7 +4,7 @@ void wsWindow::display(int lastX, int lastY,
 					   int cutX, int cutY, int cutWidth, int cutHeight) {
 	extern int debugOutput;
 	//Update this window's global position
-	if(windowID != WS_ROOT_WINDOW_ID)
+	if(fatherWindow != nullptr)
 		lastX += position.x, lastY += position.y;
 
 	//Update scissor range
@@ -30,8 +30,6 @@ void wsWindow::display(int lastX, int lastY,
 		glTexCoord2d(0, 1);
 		glVertex2i(lastX, topWindow->size.y - lastY);
 		glEnd();
-#ifdef _DEBUG
-		//Debug output
 		if (debugOutput) {
 			glDisable(GL_TEXTURE_2D);
 			glBegin(GL_LINES);
@@ -59,7 +57,6 @@ void wsWindow::display(int lastX, int lastY,
 			glEnd();
 			glEnable(GL_TEXTURE_2D);
 		}
-#endif
 	}
 
 	glPushAttrib(GL_SCISSOR_BIT);

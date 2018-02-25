@@ -1,11 +1,8 @@
 #include "wsWindow.h"
 #include "wsWindowManager.h"
 #include "wsClock.h"
+#include "checkInitAndFindWindow.h"
 
-extern int inited;
-extern thread_local wsWindow *currentWindow;
-
-#ifdef _DEBUG
 int wsSetDebugMode(int mode) {
 	extern int debugOutput;
 	if (mode ^ WS_SDM_FULL) {
@@ -15,56 +12,59 @@ int wsSetDebugMode(int mode) {
 	debugOutput = mode;
 	return true;
 }
-#endif
-
-#define checkInit(failReturnValue) do {\
-		if (!inited) {\
-			wsSetError(WS_ERR_NOT_INITIALIZED);\
-			return (failReturnValue);\
-		}\
-	}while(0)
-#define checkInitAndFindWindow(window, id, failReturnValue) do{\
-		checkInit(failReturnValue);\
-		if(currentWindow && currentWindow->windowID == (id))\
-				(window) = currentWindow;\
-		else (window) = windowManager.findWindow(id);\
-		if (!(window)) {\
-			wsSetError(WS_ERR_WINDOW_NOT_FOUND);\
-			return (failReturnValue);\
-		}\
-	}while(0)
-
 
 int wsPostRedisplay(int windowID) {
 	wsWindow* window;
 	checkInitAndFindWindow(window, windowID, false);
-	if(window->fpsControl == true && window->FPS == 0)
-		return window->needRedisplay = true;
-	else wsSetError(WS_ERR_ILLEGAL_OPERATION);
-	return false;
+	if(window->postRedisplay())
+		return true;
+	else {
+		wsSetError(WS_ERR_ILLEGAL_OPERATION);
+		return false;
+	}
 }
 
-int wsSetSwapInterval(int interval) {
+int wsSetSwapInterval(int windowID, int interval) {
+	extern thread_local wsBaseWindow* currentBaseWindow;
 	wsWindow* window;
 	checkInitAndFindWindow(window, windowID, false);
-	checkInit(false);
-	fpsControl = false;
-	if (fpsClock) delete fpsClock, fpsClock = nullptr;
+	if(window->getFatherWindow() != nullptr) {
+		wsSetError(WS_ERR_UNIMPLEMENTED);
+		return false;
+	}
+
+	if(currentBaseWindow != window)
+		glfwMakeContextCurrent(((wsBaseWindow*)window)->glfwWindow);
+
 	glfwSwapInterval(interval);
+
+	if(currentBaseWindow != window) {
+		int wsInitGLEW();
+		glfwMakeContextCurrent(currentBaseWindow->glfwWindow);
+		wsInitGLEW();
+	}
 	return true;
 }
 
-int wsSetFPS(int fps) {
-	extern int FPS;
-	extern int fpsControl;
-	extern wsClock *fpsClock;
-	checkInit(false);
-	fpsControl = true;
-	glfwSwapInterval(0);
-	FPS = fps;
-	if (fpsClock == nullptr) {
-		fpsClock = new wsClock;
+int wsSetFPS(int windowID, int fps) {
+	extern thread_local wsBaseWindow* currentBaseWindow;
+	wsWindow* window;
+	checkInitAndFindWindow(window, windowID, false);
+	if(window->getFatherWindow() != nullptr) {
+		wsSetError(WS_ERR_UNIMPLEMENTED);
+		return false;
 	}
+	if(currentBaseWindow != window)
+		glfwMakeContextCurrent(((wsBaseWindow*)window)->glfwWindow);
+
+	glfwSwapInterval(0);
+
+	if(currentBaseWindow != window) {
+		int wsInitGLEW();
+		glfwMakeContextCurrent(currentBaseWindow->glfwWindow);
+		wsInitGLEW();
+	}
+	window->setFPS(fps);
 	return true;
 }
 
@@ -159,7 +159,7 @@ int wsSetWindowPos(int windowID, int x, int y, int mode) {
 		return false;
 	}
 
-	if (windowID != 0 && (target.x > window->getFather()->size.x || target.y > window->getFather()->size.y)) {
+	if (window->getFatherWindow() != nullptr && (target.x > window->getFatherWindow()->size.x || target.y > window->getFatherWindow()->size.y)) {
 		wsSetError(WS_ERR_INVALID_VALUE);
 		return false;
 	}
@@ -191,5 +191,3 @@ int wsSetWindowData(int windowID, void * data) {
 	window->userData = data;
 	return true;
 }
-#undef checkInitAndFindWindow
-#undef checkInit

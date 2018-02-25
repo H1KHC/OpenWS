@@ -1,4 +1,3 @@
-#define WS_STATIC
 #include <stdio.h>
 #include <GL/gl.h>
 #include <openWS.h>

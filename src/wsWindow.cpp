@@ -28,10 +28,12 @@ wsWindow::wsWindow(const char * title, const wsCoord2 position,
 		nullptr				//userData
 	},
 	fpsClock(nullptr),
-	fpsControl(false), FPS(0), needRedisplay(false), needRedraw(false),
+	fpsControl(false), FPS(0), needRedraw(false), needRedisplay(false),
 	framebuffer(0), depthbuffer(0),
-	fatherWindow(nullptr), topWindow(nullptr),
-	windowUnderCursor(nullptr), thisWindowNode(nullptr)
+	fatherWindow(nullptr),
+	topWindow(nullptr), topWindowChangeTag(false),
+	thisWindowNode(nullptr),
+	windowUnderCursor(nullptr)
 {
 	int len = 0;
 	while (title[len]) ++len;
@@ -41,9 +43,20 @@ wsWindow::wsWindow(const char * title, const wsCoord2 position,
 }
 
 wsWindow::~wsWindow() {
+	extern thread_local wsBaseWindow* currentBaseWindow;
+	if(topWindow != currentBaseWindow) {
+		int wsInitGLEW();
+		glfwMakeContextCurrent(topWindow->glfwWindow);
+		wsInitGLEW();
+	}
 	if (framebuffer) glDeleteFramebuffers(1, &framebuffer);
 	if (depthbuffer) glDeleteRenderbuffers(1, &depthbuffer);
 	if (texture) glDeleteTextures(1, &texture);
+	if(topWindow != currentBaseWindow) {
+		int wsInitGLEW();
+		glfwMakeContextCurrent(currentBaseWindow->glfwWindow);
+		wsInitGLEW();
+	}
 }
 
 void wsWindow::deleteWindow() {
@@ -54,8 +67,8 @@ void wsWindow::deleteWindow() {
 		fatherWindow->subWindow.deleteNode(this);
 	} else {
 		extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
-		baseWindows[((wsBaseWindow*)this)->glfwwindow] = nullptr;
-		glfwSetWindowShouldClose(((wsBaseWindow*)this)->glfwwindow, 1);
+		baseWindows[((wsBaseWindow*)this)->glfwWindow] = nullptr;
+		glfwSetWindowShouldClose(((wsBaseWindow*)this)->glfwWindow, 1);
 	}
 	windowManager.cancelWindow(this);
 	delete[] name;

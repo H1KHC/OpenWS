@@ -401,7 +401,7 @@ WS_API int wsTerminate();
 
 struct GLFWwindow;
 /***
-  * get glfwwindow of specificated wswindow
+  * get glfwWindow of specificated wswindow
   * if windowID is WS_ROOT_WINDOW_ID, then returns the foreground one's
 ***/
 WS_API GLFWwindow* wsGetGLFWWindow(int windowID DEFAULT(WS_ROOT_WINDOW_ID));

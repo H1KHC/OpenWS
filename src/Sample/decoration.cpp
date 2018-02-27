@@ -105,7 +105,7 @@ int main() {
 	wsWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	wsWindowHint(GLFW_FLOATING, GLFW_TRUE);
 	windowID = wsCreateWindow("Example", 200, 200, 256, 256, new windowData);
-	wsSetWindowDisplayCallback(windowID, display);
+	wsSetDisplayCallback(windowID, display);
 	wsSetKeyCallback(windowID, key);
 #if defined(__linux)
 	wsSetFPS(60);

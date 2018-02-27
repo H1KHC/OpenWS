@@ -21,15 +21,15 @@ int main() {
 	wsInit();
 	wsWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	id = wsCreateWindow("LU", 128, 128, 128, 128, color[0]);
-	wsSetWindowDisplayCallback(id, display);
+	wsSetDisplayCallback(id, display);
 	wsWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	id = wsCreateWindow("RU", 256, 128, 128, 128, color[1]);
-	wsSetWindowDisplayCallback(id, display);
+	wsSetDisplayCallback(id, display);
 	wsWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	id = wsCreateWindow("LD", 128, 256, 128, 128, color[2]);
-	wsSetWindowDisplayCallback(id, display);
+	wsSetDisplayCallback(id, display);
 	wsWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	id = wsCreateWindow("RD", 256, 256, 128, 128, color[3]);
-	wsSetWindowDisplayCallback(id, display);
+	wsSetDisplayCallback(id, display);
 	wsMainLoop();
 }

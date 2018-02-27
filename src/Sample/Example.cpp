@@ -25,7 +25,7 @@ int main() {
 	wsInit();
 	root = wsCreateWindow("Example", 200, 200, 512, 512, nullptr);
 	sub = wsCreateWindow("Triangle", 128, 128, 256, 256, nullptr, WS_STYLE_DEFAULT, root);
-	wsSetWindowDisplayCallback(sub, display);
+	wsSetDisplayCallback(sub, display);
 	wsMainLoop();
 	return 0;
 }

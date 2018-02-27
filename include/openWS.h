@@ -203,19 +203,19 @@ typedef struct wsWindowInfo {
 	int focused, underCursor;
 	wsCoord2 cursorPos;
 	int styleMask;
-	wsDisplayCallback displayCallback;
-	wsMouseButtonCallback mouseButtonCallback;
-	wsCursorPosCallback cursorMoveCallback;
-	wsCursorEnterCallback cursorEnterCallback;
-	wsScrollCallback scrollCallback;
-	wsKeyCallback keyboardCallback;
-	wsCharModsCallback charCallback;
-	wsFileDropCallback fileDropCallback;
-	wsWindowPosCallback windowMoveCallback;
-	wsWindowsizeCallback windowResizeCallback;
-	wsWindowCloseCallback windowCloseCallback;
-	wsWindowFocusCallback windowFocusCallback;
-	wsWindowIconifyCallback windowIconifyCallback;
+	wsDisplayCallback		displayCallback;
+	wsMouseButtonCallback	mouseButtonCallback;
+	wsCursorPosCallback		cursorMoveCallback;
+	wsCursorEnterCallback	cursorEnterCallback;
+	wsScrollCallback		scrollCallback;
+	wsKeyCallback			keyboardCallback;
+	wsCharModsCallback		charCallback;
+	wsFileDropCallback		fileDropCallback;
+	wsWindowPosCallback		windowMoveCallback;
+	wsWindowsizeCallback	windowResizeCallback;
+	wsWindowCloseCallback	windowCloseCallback;
+	wsWindowFocusCallback	windowFocusCallback;
+	wsWindowIconifyCallback	windowIconifyCallback;
 	void *userData;
 } wsWindowInfo;
 
@@ -333,8 +333,6 @@ WS_API int wsPostRedisplay(int window);
 WS_API int wsSetSwapInterval(int basewindow, int interval);
 WS_API int wsSetFPS(int window, int fps);
 
-WS_API int wsSetJoystickCallback(wsJoystickCallback func);
-
 #define WS_SDM_CLOSE				0x00000000
 #define WS_SDM_FOCUSWINDOW			0x00000001
 #define WS_SDM_CURSORWINDOW			0x00000002
@@ -345,20 +343,21 @@ WS_API int wsSetJoystickCallback(wsJoystickCallback func);
 #define WS_SDM_FULL					0x00000007
 WS_API int wsSetDebugMode(int mode DEFAULT(WS_SDM_CLOSE));
 
-//Window-based set functions
-WS_API int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback);
-WS_API int wsSetMouseButtonCallback(int windowID, wsMouseButtonCallback callback);
-WS_API int wsSetCursorPosCallback(int windowID, wsCursorPosCallback callback);
-WS_API int wsSetCursorEnterCallback(int windowID, wsCursorEnterCallback callback);
-WS_API int wsSetScrollCallback(int windowID, wsScrollCallback callback);
-WS_API int wsSetKeyCallback(int windowID, wsKeyCallback callback);
-WS_API int wsSetCharModsCallback(int windowID, wsCharModsCallback callback);
-WS_API int wsSetDropCallback(int windowID, wsFileDropCallback callback);
-WS_API int wsSetWindowPosCallback(int windowID, wsWindowPosCallback callback);
-WS_API int wsSetWindowSizeCallback(int windowID, wsWindowsizeCallback callback);
-WS_API int wsSetWindowCloseCallback(int windowID, wsWindowCloseCallback callback);
-WS_API int wsSetWindowFocusCallback(int windowID, wsWindowFocusCallback callback);
-WS_API int wsSetWindowIconifyCallback(int windowID, wsWindowIconifyCallback callback);
+//Callbacks
+WS_API wsJoystickCallback		wsSetJoystickCallback		(wsJoystickCallback func);
+WS_API wsDisplayCallback		wsSetDisplayCallback		(int windowID, wsDisplayCallback callback);
+WS_API wsMouseButtonCallback	wsSetMouseButtonCallback	(int windowID, wsMouseButtonCallback callback);
+WS_API wsCursorPosCallback		wsSetCursorPosCallback		(int windowID, wsCursorPosCallback callback);
+WS_API wsCursorEnterCallback	wsSetCursorEnterCallback	(int windowID, wsCursorEnterCallback callback);
+WS_API wsScrollCallback			wsSetScrollCallback			(int windowID, wsScrollCallback callback);
+WS_API wsKeyCallback			wsSetKeyCallback			(int windowID, wsKeyCallback callback);
+WS_API wsCharModsCallback		wsSetCharModsCallback		(int windowID, wsCharModsCallback callback);
+WS_API wsFileDropCallback		wsSetDropCallback			(int windowID, wsFileDropCallback callback);
+WS_API wsWindowPosCallback		wsSetWindowPosCallback		(int windowID, wsWindowPosCallback callback);
+WS_API wsWindowsizeCallback		wsSetWindowSizeCallback		(int windowID, wsWindowsizeCallback callback);
+WS_API wsWindowCloseCallback	wsSetWindowCloseCallback	(int windowID, wsWindowCloseCallback callback);
+WS_API wsWindowFocusCallback	wsSetWindowFocusCallback	(int windowID, wsWindowFocusCallback callback);
+WS_API wsWindowIconifyCallback	wsSetWindowIconifyCallback	(int windowID, wsWindowIconifyCallback callback);
 
 #define WS_SWSI_RELATIVE		0x00000000
 #define WS_SWSI_ABSOLUTE		0x00000001

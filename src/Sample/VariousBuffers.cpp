@@ -73,13 +73,13 @@ int main() {
 	rootWindow = wsCreateWindow("Example", 200, 200, 512, 512, nullptr);
 	wsSetDebugMode(WS_SDM_CURSORPOS);
 	int id = wsCreateWindow("", 0, 0, 256, 256, new windowData, WS_STYLE_DEFAULT | WS_STYLE_STATIC_WINDOW, rootWindow);
-	wsSetWindowDisplayCallback(id, display);
+	wsSetDisplayCallback(id, display);
 	id = wsCreateWindow("", 0, 256, 256, 256, new windowData, WS_STYLE_DEFAULT, rootWindow);
-	wsSetWindowDisplayCallback(id, display);
+	wsSetDisplayCallback(id, display);
 	id = wsCreateWindow("", 256, 0, 256, 256, new windowData, WS_STYLE_ALIGN_LU | WS_STYLE_STATIC_WINDOW, rootWindow);
-	wsSetWindowDisplayCallback(id, display);
+	wsSetDisplayCallback(id, display);
 	id = wsCreateWindow("", 256, 256, 256, 256, new windowData, WS_STYLE_ALIGN_LU, rootWindow);
-	wsSetWindowDisplayCallback(id, display);
+	wsSetDisplayCallback(id, display);
 	wsMainLoop();
 	return 0;
 }

@@ -84,8 +84,8 @@ protected:
 							  void *windowData, int windowStyle,
 							  int fatherWindowID);
 
-	friend int wsSetWindowDisplayCallback(int windowID,
-										  wsDisplayCallback callback);
+	friend wsDisplayCallback wsSetDisplayCallback(int windowID,
+												  wsDisplayCallback callback);
 
 public:
 	unsigned getFramebuffer() {

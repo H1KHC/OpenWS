@@ -455,8 +455,5 @@ int main() {
 	wsSetDisplayCallback(id, displayInfo);
 	wsSetDisplayCallback(rootWindow, flushUnderColor);
 	wsSetKeyCallback(rootWindow, keyCallback);
-	#ifdef linux
-	wsSetFPS(60);
-	#endif
 	wsMainLoop();
 }

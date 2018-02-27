@@ -163,7 +163,9 @@ int wsSetWindowPos(int windowID, int x, int y, int mode) {
 		wsSetError(WS_ERR_INVALID_VALUE);
 		return false;
 	}
-	window->windowMoveReceiver(target);
+	if(window->getFatherWindow() == nullptr) {
+		glfwSetWindowPos(((wsBaseWindow*)window)->glfwWindow, target.x, target.y);
+	} else window->windowMoveReceiver(target);
 	return true;
 }
 int wsSetWindowStyle(int windowID, int style, int mode) {

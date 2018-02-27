@@ -108,7 +108,7 @@ int main() {
 	wsSetDisplayCallback(windowID, display);
 	wsSetKeyCallback(windowID, key);
 #if defined(__linux)
-	wsSetFPS(60);
+//	wsSetFPS(60);
 	XShapeCombineRectangles(glfwGetX11Display(), glfwGetX11Window(wsGetGLFWWindow()), ShapeInput, 0, 0, NULL, 0, ShapeSet, YXBanded);
 #elif defined(WIN32)
 	HWND hWnd = glfwGetWin32Window(wsGetGLFWWindow());

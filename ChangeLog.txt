@@ -4,6 +4,10 @@ YYYY-MM-DD {
 	- delete
 }
 
+2018-02-[23, ..., 27] {
+	* changed from single-basewindow to multi-basewindow
+}
+
 2018-02-22 {
 	* Changed parameter order of function wsCreateWindow
 }

@@ -163,9 +163,6 @@ void wsWindow::windowResizeReceiver(wsCoord2 newSize) {
 }
 void wsWindow::windowMoveReceiver(wsCoord2 newPos) {
 	position = newPos;
-	if(fatherWindow == nullptr) {
-		glfwSetWindowPos(((wsBaseWindow*)this)->glfwWindow, position.x, position.y);
-	}
 	if (windowMoveCallback) {
 		makeContextCurrent();
 		windowMoveCallback(windowID, newPos.x, newPos.y);

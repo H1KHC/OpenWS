@@ -126,7 +126,7 @@ int main() {
 		return -1;
 	}
 	rootWindow = wsCreateWindow("messages", 200, 200, 512, 512, new windowData);
-	wsSetWindowDisplayCallback(rootWindow, display);
+	wsSetDisplayCallback(rootWindow, display);
 	wsSetMouseButtonCallback(rootWindow, mouseButton);
 	wsSetCursorPosCallback(rootWindow, cursorMove);
 	wsSetCursorEnterCallback(rootWindow, cursorEnter);
@@ -141,7 +141,7 @@ int main() {
 	wsSetDebugMode(WS_SDM_FULL);
 	wsSetWindowUserPointer(rootWindow, new windowData);
 	int id = wsCreateWindow("", 128, 128, 256, 256, new windowData, WS_STYLE_DEFAULT, rootWindow);
-	wsSetWindowDisplayCallback(id, display);
+	wsSetDisplayCallback(id, display);
 	wsSetMouseButtonCallback(id, mouseButton);
 	wsSetCursorPosCallback(id, cursorMove);
 	wsSetCursorEnterCallback(id, cursorEnter);

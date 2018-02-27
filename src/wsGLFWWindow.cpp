@@ -75,6 +75,12 @@ void wsFileDropReceiver(GLFWwindow* window, int count, const char **filename) {
 		windowPair->second->fileDropReceiver(count, filename);
 }
 
+void windowIconifyReceiver(GLFWwindow *window, int iconified) {
+	extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
+	wsWindow* wswindow = baseWindows[window];
+	wswindow->windowIconifyCallback(wswindow->windowID, iconified == GLFW_TRUE);
+}
+
 struct windowHintData { int hint, value; };
 static wsList<windowHintData> windowHintLists;
 void wsWindowHint(int hint, int value) {

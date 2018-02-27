@@ -2,33 +2,15 @@
 #include <GLFW/glfw3.h>
 #include "checkInitAndFindWindow.h"
 
-int wsSetJoystickCallback(wsJoystickCallback func) {
-	checkInit(false);
-	glfwSetJoystickCallback(func);
-	return true;
+wsJoystickCallback wsSetJoystickCallback(wsJoystickCallback func) {
+	checkInit(nullptr);
+	return glfwSetJoystickCallback(func);
 }
 
-void windowIconifyReceiver(GLFWwindow *window, int iconified) {
-	extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
-	wsWindow* wswindow = baseWindows[window];
-	wswindow->windowIconifyCallback(wswindow->windowID, iconified == GLFW_TRUE);
-}
-
-int wsSetWindowIconifyCallback(int windowID, wsWindowIconifyCallback callback) {
-	wsWindow* baseWindow;
-	checkInitAndFindWindow(baseWindow, windowID, false);
-	if(baseWindow->getFatherWindow() != nullptr) {
-		wsSetError(WS_ERR_UNIMPLEMENTED);
-		return false;
-	}
-	baseWindow->windowIconifyCallback = callback;
-	glfwSetWindowIconifyCallback(((wsBaseWindow*)baseWindow)->glfwWindow, nullptr);
-	return true;
-}
-
-int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback) {
+wsDisplayCallback wsSetDisplayCallback(int windowID, wsDisplayCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsDisplayCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
 	if(window->styleMask & WS_STYLE_NO_FRAMEBUFFER && window->framebuffer) {
 		window->makeContextCurrent();
 		callback(windowID, window->framebuffer);
@@ -36,74 +18,116 @@ int wsSetWindowDisplayCallback(int windowID, wsDisplayCallback callback) {
 		if(!(window->styleMask & WS_STYLE_NO_DEPTHBUFFER) && window->depthbuffer)
 			glDeleteRenderbuffers(1, &window->depthbuffer);
 		glDeleteFramebuffers(1, &window->framebuffer);
+		return nullptr;
 	} else {
+		prev = window->displayCallback;
 		window->displayCallback = callback;
+		return prev;
 	}
-	return true;
 }
-int wsSetMouseButtonCallback(int windowID, wsMouseButtonCallback callback) {
+
+wsMouseButtonCallback wsSetMouseButtonCallback(int windowID, wsMouseButtonCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsMouseButtonCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->mouseButtonCallback;
 	window->mouseButtonCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetCursorPosCallback(int windowID, wsCursorPosCallback callback) {
+
+wsCursorPosCallback wsSetCursorPosCallback(int windowID, wsCursorPosCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsCursorPosCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->cursorMoveCallback;
 	window->cursorMoveCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetCursorEnterCallback(int windowID, wsCursorEnterCallback callback) {
+wsCursorEnterCallback wsSetCursorEnterCallback(int windowID, wsCursorEnterCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsCursorEnterCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->cursorEnterCallback;
 	window->cursorEnterCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetScrollCallback(int windowID, wsScrollCallback callback) {
+wsScrollCallback wsSetScrollCallback(int windowID, wsScrollCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsScrollCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->scrollCallback;
 	window->scrollCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetKeyCallback(int windowID, wsKeyCallback callback) {
+wsKeyCallback wsSetKeyCallback(int windowID, wsKeyCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsKeyCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->keyboardCallback;
 	window->keyboardCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetCharModsCallback(int windowID, wsCharModsCallback callback) {
+wsCharModsCallback wsSetCharModsCallback(int windowID, wsCharModsCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsCharModsCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->charCallback;
 	window->charCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetDropCallback(int windowID, wsFileDropCallback callback) {
+wsFileDropCallback wsSetDropCallback(int windowID, wsFileDropCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsFileDropCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->fileDropCallback;
 	window->fileDropCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetWindowPosCallback(int windowID, wsWindowPosCallback callback) {
+wsWindowPosCallback wsSetWindowPosCallback(int windowID, wsWindowPosCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsWindowPosCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->windowMoveCallback;
 	window->windowMoveCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetWindowSizeCallback(int windowID, wsWindowsizeCallback callback) {
+wsWindowsizeCallback wsSetWindowSizeCallback(int windowID, wsWindowsizeCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsWindowsizeCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->windowResizeCallback;
 	window->windowResizeCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetWindowCloseCallback(int windowID, wsWindowCloseCallback callback) {
+wsWindowCloseCallback wsSetWindowCloseCallback(int windowID, wsWindowCloseCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsWindowCloseCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->windowCloseCallback;
 	window->windowCloseCallback = callback;
-	return true;
+	return prev;
 }
-int wsSetWindowFocusCallback(int windowID, wsWindowFocusCallback callback) {
+wsWindowFocusCallback wsSetWindowFocusCallback(int windowID, wsWindowFocusCallback callback) {
 	wsWindow *window;
-	checkInitAndFindWindow(window, windowID, false);
+	wsWindowFocusCallback prev;
+	checkInitAndFindWindow(window, windowID, nullptr);
+	prev = window->windowFocusCallback;
 	window->windowFocusCallback = callback;
-	return true;
+	return prev;
+}
+
+wsWindowIconifyCallback wsSetWindowIconifyCallback(int windowID, wsWindowIconifyCallback callback) {
+	void windowIconifyReceiver(GLFWwindow *window, int iconified);
+	wsWindow* baseWindow;
+	wsWindowIconifyCallback prev;
+	checkInitAndFindWindow(baseWindow, windowID, nullptr);
+	if(baseWindow->getFatherWindow() != nullptr) {
+		wsSetError(WS_ERR_UNIMPLEMENTED);
+		return nullptr;
+	}
+	prev = baseWindow->windowIconifyCallback;
+	baseWindow->windowIconifyCallback = callback;
+	glfwSetWindowIconifyCallback(((wsBaseWindow*)baseWindow)->glfwWindow,
+		callback ? windowIconifyReceiver : nullptr);
+	return prev;
 }

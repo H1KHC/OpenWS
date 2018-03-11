@@ -91,14 +91,20 @@ int wsAttachWindow(int subwindowID, int fatherWindowID) {
 		wsSetError(WS_ERR_ILLEGAL_OPERATION);
 		return false;
 	}
-	if(fatherWindowID == WS_ROOT_WINDOW_ID) {
-		wsSetError(WS_ERR_UNIMPLEMENTED);
-		return false;
-	}
 	findWindow(subWindow, subwindowID, false);
+	
+	if(fatherWindowID == WS_ROOT_WINDOW_ID) {
+		if(subWindow->fatherWindow == nullptr) return true;
+		wsBaseWindow newBaseWindow = subWindow;
+		if(!createGLFWwindow(newBaseWindow)) return false;
+		else {
+			extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
+			baseWindows.insert(std::make_pair(newBaseWindow->glfwWindow, newBaseWindow));
+		} return true;
+	}
+	
 	findWindow(fatherWindow, fatherWindowID, false);
-	if(subWindow->fatherWindow == nullptr ||
-	  fatherWindow->fatherWindow == nullptr) {
+	if(subWindow->fatherWindow == nullptr) {
 		wsSetError(WS_ERR_UNIMPLEMENTED);
 		return false;
 	}

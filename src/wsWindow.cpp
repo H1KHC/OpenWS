@@ -43,20 +43,6 @@ wsWindow::wsWindow(const char * title, const wsCoord2 position,
 }
 
 wsWindow::~wsWindow() {
-	extern thread_local wsBaseWindow* currentBaseWindow;
-	if(topWindow != currentBaseWindow) {
-		int wsInitGLEW();
-		glfwMakeContextCurrent(topWindow->glfwWindow);
-		wsInitGLEW();
-	}
-	if (framebuffer) glDeleteFramebuffers(1, &framebuffer);
-	if (depthbuffer) glDeleteRenderbuffers(1, &depthbuffer);
-	if (texture) glDeleteTextures(1, &texture);
-	if(topWindow != currentBaseWindow) {
-		int wsInitGLEW();
-		glfwMakeContextCurrent(currentBaseWindow->glfwWindow);
-		wsInitGLEW();
-	}
 }
 
 void wsWindow::deleteWindow() {
@@ -72,5 +58,19 @@ void wsWindow::deleteWindow() {
 	}
 	windowManager.cancelWindow(this);
 	delete[] name;
+	extern thread_local wsBaseWindow* currentBaseWindow;
+	if(topWindow != currentBaseWindow) {
+		int wsInitGLEW();
+		glfwMakeContextCurrent(topWindow->glfwWindow);
+		wsInitGLEW();
+	}
+	if (framebuffer) glDeleteFramebuffers(1, &framebuffer);
+	if (depthbuffer) glDeleteRenderbuffers(1, &depthbuffer);
+	if (texture) glDeleteTextures(1, &texture);
+	if(topWindow != currentBaseWindow) {
+		int wsInitGLEW();
+		glfwMakeContextCurrent(currentBaseWindow->glfwWindow);
+		wsInitGLEW();
+	}
 	delete this;
 }

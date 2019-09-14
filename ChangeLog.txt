@@ -4,8 +4,13 @@ YYYY-MM-DD {
 	- delete
 }
 
+2019-09-14 {
+	* changed build system from makefile to cmake
+	* fixed a bug where the window position doesn't work when creating window
+}
+
 2018-02-[23, ..., 27] {
-	* changed from single-basewindow to multi-basewindow
+	+ added multiple basewindow support
 }
 
 2018-02-22 {

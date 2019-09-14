@@ -24,3 +24,9 @@ Function:
 - [ ] wsWaitForWindowClose(int windowID)
     - [ ] create a seperate thread for each glfw window(impossible for mac now)
     - [ ] add a global signal varible (like windows' Event), to notify all waiting threads when one thread is closed
+
+- [ ] wsDisplayMode(int baseWindowID, Mode)
+    - Mode is one in { Active, Passive }, in Active mode the window flushes
+        each time possible, and in Passive mode it flushes only when an event is
+        triggered
+    - Implement detail: glPullEvents for Passive, glfwWaitEvent for Active 

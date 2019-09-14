@@ -12,15 +12,18 @@ As it uses framebuffer to maintain windows, this library may doesn't support the
 
 ## Compiling OpenWS
 
-OpenWS uses makefile to compile.
+OpenWS uses cmake to compile.
 
-To compile this library, you may simply cd into this directory, and run `make` to build.
+To build, please run following commands:
+```bash
+$ git clone https://github.com/H1KHC/openWS
+$ mkdir .build && cd .build
+$ cmake ..
+$ make
+```
 
-Some options are available:
-- `DEBUG=true` : debug version
-- `STATIC=true`: static library
-- `BIT=64`     : 64-bit version (unimplemented)
-- `sample`       will build samples
+And to make samples, run `cmake .. -DBUILD_SAMPLES=ON`
+
 
 ## Using OpenWS
 

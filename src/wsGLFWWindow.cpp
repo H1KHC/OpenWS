@@ -110,8 +110,8 @@ int createGLFWwindow(wsBaseWindow* window) {
 	glfwSwapInterval(1);
 
 	baseWindows.insert(std::make_pair(window->glfwWindow, window));
-	// glfwSetWindowPos(window->glfwWindow, window->position.x > 0 ? window->position.x : 1,
-	// 						 window->position.y > 0 ? window->position.y : 1);
+	glfwSetWindowPos(window->glfwWindow, window->position.x > 0 ? window->position.x : 1,
+							 window->position.y > 0 ? window->position.y : 1);
 
 	return true;
 }

@@ -85,6 +85,8 @@ int wsCloseWindow(int windowID) {
 }
 
 int wsAttachWindow(int subwindowID, int fatherWindowID) {
+	int createGLFWwindow(wsBaseWindow* window);
+
 	wsWindow *subWindow, *fatherWindow;
 	checkInit(false);
 	if (subwindowID == WS_ROOT_WINDOW_ID || subwindowID == fatherWindowID) {
@@ -95,7 +97,7 @@ int wsAttachWindow(int subwindowID, int fatherWindowID) {
 	
 	if(fatherWindowID == WS_ROOT_WINDOW_ID) {
 		if(subWindow->fatherWindow == nullptr) return true;
-		wsBaseWindow newBaseWindow = subWindow;
+		wsBaseWindow *newBaseWindow = (wsBaseWindow*)subWindow;
 		if(!createGLFWwindow(newBaseWindow)) return false;
 		else {
 			extern std::map<GLFWwindow*, wsBaseWindow*> baseWindows;
